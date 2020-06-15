@@ -40,7 +40,6 @@ class Network(object):
             else:
                 self.ckpt_dir = os.path.join(ckpt_dir, flags.model_name)
         self.model = self.create_model()                        # The model itself
-        self.loss = self.make_loss()                            # The loss function
         self.optm = None                                        # The optimizer: Initialized at train() due to GPU
         self.optm_eval = None                                   # The eval_optimizer: Initialized at eva() due to GPU
         self.lr_scheduler = None                                # The lr scheduler: Initialized at train() due to GPU
@@ -55,11 +54,11 @@ class Network(object):
         :return: the created nn module
         """
         model = self.model_fn(self.flags)
-        summary(model, input_size=(1, 512, 512))
+        summary(model, input_size=(3, 224, 224))
         print(model)
         return model
 
-    def dice_loss(pred, target, smooth=1.):
+    def dice_loss(self, pred, target, smooth=1.):
         pred = pred.contiguous()
         target = target.contiguous()
 
@@ -79,8 +78,10 @@ class Network(object):
         :return: the total loss
         """
         import torch.nn.functional as F
+        print("pred shape", np.shape(pred))
+        print("target shape", np.shape(target))
         bce = F.binary_cross_entropy_with_logits(pred, target)
-        pred = F.sigmoid(pred)
+        pred = torch.sigmoid(pred)
         dice = self.dice_loss(pred, target)
         loss = bce * bce_weight + dice * (1 - bce_weight)
 
@@ -90,7 +91,7 @@ class Network(object):
 
         return loss
 
-    def print_metrics(metrics, epoch_samples, phase):
+    def print_metrics(self, metrics, epoch_samples, phase):
         outputs = []
         for k in metrics.keys():
             outputs.append("{}: {:4f}".format(k, metrics[k] / epoch_samples))
@@ -163,12 +164,16 @@ class Network(object):
             metrics = defaultdict(float)
             # boundary_loss = 0                 # Unnecessary during training since we provide geometries
             self.model.train()
-            for j, (inputs, labels) in enumerate(self.train_loader):
+            for j, sample in enumerate(self.train_loader):
+                inputs = sample['image']
+                labels = sample['labels']
                 if cuda:
                     inputs = inputs.cuda()                          # Put data onto GPU
                     labels = labels.cuda()                            # Put data onto GPU
                 self.optm.zero_grad()                               # Zero the gradient first
-                logit = self.model(inputs)                        # Get the output
+                #print('input type:', type(inputs), inputs)
+                #print('label type:', type(labels), labels)
+                logit = self.model(inputs.float())                        # Get the output
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer

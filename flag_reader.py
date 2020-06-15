@@ -41,6 +41,11 @@ def read_flag():
     # Data Specific Params
     parser.add_argument('--img-l', type=int, default=IMG_L, help='Length of the image')
     parser.add_argument('--img-w', type=int, default=IMG_W, help='Width of the image')
+    parser.add_argument('--root-dir', type=str, default=ROOT_DIR, help='The Root directory to get the images')
+    parser.add_argument('--label-file', type=str, default=LABEL_FILE, help='The label file to get the list of names')
+    parser.add_argument('--cut-square', type=bool, default=CUT_SQUARE, help='the flag to cut the image into 496 x 496')
+
+
 
     flags = parser.parse_args()  # This is for command line version of the code
     # flags = parser.parse_args(args = [])#This is for jupyter notebook version of the code

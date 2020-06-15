@@ -17,23 +17,32 @@ class EyeDataset(Dataset):
         :param transform: The transforms to apply
         """
         self.root_dir = flags.root_dir
-        self.labels = pd.read_csv(flags.label_file)
+        self.labels = pd.read_csv(flags.label_file, header=None, index_col=0).astype('str')
         self.img_l, self.img_w = flags.img_l, flags.img_w
+        self.cut_square = flags.cut_square
         self.transform = transform
 
     def __len__(self):
-        return len(self.input_images)
+        return len(self.labels)
 
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
+        print('Idx: ', idx)
         img_name = os.path.join(self.root_dir,
                                 self.labels.iloc[idx, 0])
+
+        label_name = os.path.join(self.root_dir, 'mask', self.labels.iloc[idx, 0].replace('.jpg', '.csv'))
+        labels = np.expand_dims(pd.read_csv(label_name, header=None, dtype='float', sep=' ').values, axis=0)
+        labels_inv = 1 - labels
+        labels = np.concatenate([labels, labels_inv], axis=0)
         image = io.imread(img_name)
-        labels = self.labels.iloc[idx, 1:]
-        labels = np.array([labels])
-        labels = labels.astype('float').reshape(-1, self.img_w, self.img_l)
+        # cut to square for simplicity now
+        # print(np.shape(image))
+        if self.cut_square:
+            image = image[ :self.img_w, :self.img_w]
+            labels = labels[:, :self.img_w, :self.img_w]
         sample = {'image': image, 'labels': labels}
 
         if self.transform:
@@ -41,30 +50,20 @@ class EyeDataset(Dataset):
 
         return sample
 
-    def __getitem__(self, idx):
-        image = self.input_images[idx]
-        mask = self.target_masks[idx]
-        if self.transform:
-            image = self.transform(image)
+class ToTensor(object):
+    """Convert ndarrays in sample to Tensors."""
 
-        return [image, mask]
+    def __call__(self, sample):
+        image, labels = sample['image'], sample['labels']
+        # Make the image into 3 dimension
+        image = np.expand_dims(image, axis=0)
+        image = np.concatenate([image, image, image], axis=0).astype('float')
+        #image = image.transpose((2, 0, 1))
+        return {'image': torch.from_numpy(image),
+                'labels': torch.from_numpy(labels)}
 
-# use the same transformations for train/val in this example
-trans = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]) # imagenet
-])
-
-train_set = SimDataset(2000, transform = trans)
-val_set = SimDataset(200, transform = trans)
-
-image_datasets = {
-    'train': train_set, 'val': val_set
-}
-
-batch_size = 25
-
-dataloaders = {
-    'train': DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=0),
-    'val': DataLoader(val_set, batch_size=batch_size, shuffle=True, num_workers=0)
-}
+def read_data(flags):
+    trainSet = EyeDataset(flags, transform=ToTensor())
+    train_loader = DataLoader(trainSet, batch_size=flags.batch_size, shuffle=True)
+    test_loader = train_loader
+    return train_loader, test_loader
