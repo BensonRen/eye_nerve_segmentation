@@ -54,6 +54,9 @@ class Network(object):
         :return: the created nn module
         """
         model = self.model_fn(self.flags)
+        cuda = True if torch.cuda.is_available() else False
+        if cuda:
+            model.cuda()
         summary(model, input_size=(3, 224, 224))
         print(model)
         return model
@@ -177,10 +180,11 @@ class Network(object):
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
-
+            epoch_samples += inputs.size(0)
             self.print_metrics(metrics, epoch_samples, 'training')
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
         self.log.close()
         tk.record(1)                    # Record at the end of the training
+
 
