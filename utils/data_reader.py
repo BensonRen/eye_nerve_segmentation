@@ -29,7 +29,7 @@ class EyeDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        print('Idx: ', idx)
+        #print('Idx: ', idx)
         img_name = os.path.join(self.root_dir,
                                 self.labels.iloc[idx, 0])
 

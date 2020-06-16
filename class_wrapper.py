@@ -81,8 +81,8 @@ class Network(object):
         :return: the total loss
         """
         import torch.nn.functional as F
-        print("pred shape", np.shape(pred))
-        print("target shape", np.shape(target))
+        #print("pred shape", np.shape(pred))
+        #print("target shape", np.shape(target))
         bce = F.binary_cross_entropy_with_logits(pred, target)
         pred = torch.sigmoid(pred)
         dice = self.dice_loss(pred, target)
@@ -174,17 +174,23 @@ class Network(object):
                     inputs = inputs.cuda()                          # Put data onto GPU
                     labels = labels.cuda()                            # Put data onto GPU
                 self.optm.zero_grad()                               # Zero the gradient first
-                #print('input type:', type(inputs), inputs)
-                #print('label type:', type(labels), labels)
                 logit = self.model(inputs.float())                        # Get the output
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
             epoch_samples += inputs.size(0)
             self.print_metrics(metrics, epoch_samples, 'training')
+
+            self.log.add_scalar('Loss/bce', metrics['bce'], epoch)
+            self.log.add_scalar('Loss/dice', metrics['dice'], epoch)
+            self.log.add_scalar('Loss/loss', metrics['loss'], epoch)
+
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
         self.log.close()
         tk.record(1)                    # Record at the end of the training
+
+        # Save the module at the end
+        self.save()
 
 

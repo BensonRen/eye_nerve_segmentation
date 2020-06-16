@@ -6,9 +6,15 @@
 
 To-do list: 
 - [x] make the README file explaining the project 
-- [ ] understand the type of data that I need in this project
-- [ ] make the helper function to read and load pictures into Pytorch dataset
-- [ ] make the helper function to read labels into Pytorch dataset
+- [x] understand the type of data that I need in this project
+- [x] make the helper function to read and load pictures into Pytorch dataset
+- [x] make the helper function to read labels into Pytorch dataset
+- [x] start finish the Unet model
+- [x] Debug and run the training module
+- [x] Work on GPU version of minimal training product
+- [ ] Add loss monitoring
+- [ ] Add evaluation module
+- [ ] Split the dataset
 
 
 
