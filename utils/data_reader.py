@@ -36,6 +36,7 @@ class EyeDataset(Dataset):
         label_name = os.path.join(self.root_dir, 'mask', self.labels.iloc[idx, 0].replace('.jpg', '.csv'))
         labels = np.expand_dims(pd.read_csv(label_name, header=None, dtype='float', sep=' ').values, axis=0)
         labels_inv = 1 - labels
+        #labels_inv = np.logical_not(labels)
         labels = np.concatenate([labels, labels_inv], axis=0)
         image = io.imread(img_name)
         # cut to square for simplicity now

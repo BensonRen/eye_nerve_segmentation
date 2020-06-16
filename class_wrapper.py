@@ -19,9 +19,10 @@ import numpy as np
 from math import inf
 import matplotlib.pyplot as plt
 import pandas as pd
+from sklearn.metrics import jaccard_similarity_score as jsc
+
 # Own module
 from utils.time_recorder import time_keeper
-
 class Network(object):
     def __init__(self, model_fn, flags, train_loader, test_loader,
                  ckpt_dir=os.path.join(os.path.abspath(''), 'models'),
@@ -93,6 +94,17 @@ class Network(object):
         metrics['loss'] += loss.data.cpu().numpy() * target.size(0)
 
         return loss
+
+    def compute_iou(self, pred, target):
+        """
+        Compute the IOU
+        """
+        print("shape of the original prediction", np.shape(pred.cpu().data.numpy()))
+        lbl = pred.cpu().data.numpy()[:,0,:,:].reshape(-1) > 0
+        tgt = target.cpu().data.numpy()[:,0,:,:].reshape(-1)
+        print("shape of lbl in compute iou", np.shape(lbl))
+        print("shape of tgt in compute iou", np.shape(tgt))
+        return jsc(tgt, lbl)
 
     def print_metrics(self, metrics, epoch_samples, phase):
         outputs = []
@@ -168,23 +180,29 @@ class Network(object):
             # boundary_loss = 0                 # Unnecessary during training since we provide geometries
             self.model.train()
             for j, sample in enumerate(self.train_loader):
-                inputs = sample['image']
-                labels = sample['labels']
+                inputs = sample['image']                                # Get the input
+                labels = sample['labels']                               # Get the labels
                 if cuda:
-                    inputs = inputs.cuda()                          # Put data onto GPU
-                    labels = labels.cuda()                            # Put data onto GPU
-                self.optm.zero_grad()                               # Zero the gradient first
+                    inputs = inputs.cuda()                              # Put data onto GPU
+                    labels = labels.cuda()                              # Put data onto GPU
+                self.optm.zero_grad()                                   # Zero the gradient first
                 logit = self.model(inputs.float())                        # Get the output
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
             epoch_samples += inputs.size(0)
+            IoU = self.compute_iou(logit, labels)
+            
             self.print_metrics(metrics, epoch_samples, 'training')
+            print('IoU in current epoch is', IoU)
 
             self.log.add_scalar('Loss/bce', metrics['bce'], epoch)
             self.log.add_scalar('Loss/dice', metrics['dice'], epoch)
             self.log.add_scalar('Loss/loss', metrics['loss'], epoch)
-
+            self.log.add_scalar('IoU', IoU, epoch)
+             
+            if loss < self.best_validation_loss:
+                self.best_validation_loss = loss
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
         self.log.close()

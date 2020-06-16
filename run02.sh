@@ -4,7 +4,7 @@
 #SBATCH --mem=20G                                                      # request 20G memory
 #SBATCH -c 1                                                           # request 6 gpu cores                                    
 #SBATCH -p collinslab                                     # request 1 gpu for this job
-#SBATCH --exclude=dcc-collinslab-gpu-[03,01,04]
+#SBATCH --exclude=dcc-collinslab-gpu-[01,03,04]
 module load Anaconda3/3.5.2                                            # load conda to make sure use GPU version of tf
 # add cuda and cudnn path
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH

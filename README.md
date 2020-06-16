@@ -12,7 +12,8 @@ To-do list:
 - [x] start finish the Unet model
 - [x] Debug and run the training module
 - [x] Work on GPU version of minimal training product
-- [ ] Add loss monitoring
+- [x] Add loss monitoring
+- [ ] Try full datasets training
 - [ ] Add evaluation module
 - [ ] Split the dataset
 
