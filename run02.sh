@@ -13,8 +13,8 @@ export LD_LIBRARY_PATH=/opt/apps/rhel7/cudnn/lib64:$LD_LIBRARY_PATH
 export PYTHONPATH=$PYTHONPATH:/work/sr365/Pytorch
 # execute my file
 # python hyperswipe04.py
-# python utils/get_mask.py
+python utils/get_mask.py
 # python plotswipe.py
-python train.py
+# python train.py
 # python test.py
 # python evaluate.py

@@ -33,12 +33,14 @@ class EyeDataset(Dataset):
         img_name = os.path.join(self.root_dir,
                                 self.labels.iloc[idx, 0])
 
-        label_name = os.path.join(self.root_dir, 'mask', self.labels.iloc[idx, 0].replace('.jpg', '.csv'))
-        labels = np.expand_dims(pd.read_csv(label_name, header=None, dtype='float', sep=' ').values, axis=0)
+        label_name = os.path.join(self.root_dir, 'mask', self.labels.iloc[idx, 0])
+        labels = np.expand_dims(io.imread(label_name)>200, axis=0)              # 200 is the threshold for rounding
         labels_inv = 1 - labels
         #labels_inv = np.logical_not(labels)
         labels = np.concatenate([labels, labels_inv], axis=0)
         image = io.imread(img_name)
+        #print("shape of read labels", np.shape(labels))
+        #print("shape of read image", np.shape(image))
         # cut to square for simplicity now
         # print(np.shape(image))
         if self.cut_square:
@@ -59,6 +61,9 @@ class ToTensor(object):
         # Make the image into 3 dimension
         image = np.expand_dims(image, axis=0)
         image = np.concatenate([image, image, image], axis=0).astype('float')
+        labels = labels.astype('float')
+        #labels = np.expand_dims(labels, axis=0)
+        #labels = np.concatenate([labels, labels, labels], axis=0).astype('float')
         #image = image.transpose((2, 0, 1))
         return {'image': torch.from_numpy(image),
                 'labels': torch.from_numpy(labels)}

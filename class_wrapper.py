@@ -82,8 +82,10 @@ class Network(object):
         :return: the total loss
         """
         import torch.nn.functional as F
-        #print("pred shape", np.shape(pred))
-        #print("target shape", np.shape(target))
+        print("pred shape", np.shape(pred), "type", type(pred))
+        print("target shape", np.shape(target), "type", type(target))
+        print(pred)
+        print(target)
         bce = F.binary_cross_entropy_with_logits(pred, target)
         pred = torch.sigmoid(pred)
         dice = self.dice_loss(pred, target)

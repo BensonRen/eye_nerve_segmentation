@@ -1,33 +1,5 @@
 Anaconda3 3.5.2
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/sklearn/metrics/_classification.py:664: FutureWarning: jaccard_similarity_score has been deprecated and replaced with jaccard_score. It will be removed in version 0.23. This implementation has surprising behavior for binary and multiclass classification tasks.
-  FutureWarning)
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type ResNetUNet. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type ResNet. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type Conv2d. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type BatchNorm2d. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type ReLU. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type MaxPool2d. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type Sequential. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type BasicBlock. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type AdaptiveAvgPool2d. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type Linear. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
-/hpc/home/sr365/.conda/envs/BenICMLTorch/lib/python3.7/site-packages/torch/serialization.py:292: UserWarning: Couldn't retrieve source code for container of type Upsample. It won't be checked for correctness upon loading.
-  "type " + obj.__name__ + ". It won't be checked "
 Traceback (most recent call last):
-  File "train.py", line 47, in <module>
-    training_from_flag(flags)
-  File "train.py", line 38, in training_from_flag
-    write_flags_and_BVE(flags, ntwk.best_validation_loss, ntwk.ckpt_dir)
-  File "/hpc/home/sr365/Eyeproject/utils/helper_functions.py", line 177, in write_flags_and_BVE
-    yrange = flags.y_range
-AttributeError: 'Namespace' object has no attribute 'y_range'
+  File "utils/get_mask.py", line 4, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'

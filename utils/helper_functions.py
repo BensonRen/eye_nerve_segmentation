@@ -160,7 +160,7 @@ def load_flags(save_dir, save_file="flags.obj"):
 
 
 # 8
-def write_flags_and_BVE(flags, best_validation_loss, save_dir, forward_best_loss=None):
+def write_flags_and_BVE(flags, best_validation_loss, save_dir):
     """
     The function that is usually executed at the end of the training where the flags and the best validation loss are recorded
     They are put in the folder that called this function and save as "parameters.txt"
@@ -171,14 +171,8 @@ def write_flags_and_BVE(flags, best_validation_loss, save_dir, forward_best_loss
     :return: None
     """
     flags.best_validation_loss = best_validation_loss  # Change the y range to be acceptable long string
-    if forward_best_loss is not None:
-        flags.best_forward_validation_loss = forward_best_loss
-    # To avoid terrible looking shape of y_range
-    yrange = flags.y_range
     # yrange_str = str(yrange[0]) + ' to ' + str(yrange[-1])
-    yrange_str = [yrange[0], yrange[-1]]
     copy_flags = deepcopy(flags)
-    copy_flags.y_range = yrange_str  # in order to not corrupt the original data strucutre
     flags_dict = vars(copy_flags)
     # Convert the dictionary into pandas data frame which is easier to handle with and write read
     with open(os.path.join(save_dir, 'parameters.txt'), 'w') as f:
