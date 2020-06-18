@@ -2,9 +2,15 @@
 
 ## A project collaboration with Med school to segment the eye nerve from eye CT scans
 
+## Dependencies
+Pytorch
+Torchvision
+pandas
+scipy
+scikit-learn
 
 
-To-do list: 
+## To-do list: 
 - [x] make the README file explaining the project 
 - [x] understand the type of data that I need in this project
 - [x] make the helper function to read and load pictures into Pytorch dataset
@@ -13,6 +19,7 @@ To-do list:
 - [x] Debug and run the training module
 - [x] Work on GPU version of minimal training product
 - [x] Add loss monitoring
+- [ ] Solve the environment issue
 - [ ] Try full datasets training
 - [ ] Add evaluation module
 - [ ] Split the dataset

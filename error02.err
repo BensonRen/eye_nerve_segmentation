@@ -1,5 +1,1 @@
 Anaconda3 3.5.2
-Traceback (most recent call last):
-  File "utils/get_mask.py", line 4, in <module>
-    import pandas as pd
-ModuleNotFoundError: No module named 'pandas'

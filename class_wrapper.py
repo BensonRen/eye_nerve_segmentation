@@ -6,6 +6,7 @@ import os
 import time
 import sys
 from collections import defaultdict
+from math import inf
 
 # Torch
 import torch
@@ -16,7 +17,6 @@ from torch.optim import lr_scheduler
 
 # Libs
 import numpy as np
-from math import inf
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import jaccard_similarity_score as jsc
