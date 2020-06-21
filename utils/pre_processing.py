@@ -7,10 +7,7 @@ This script split and pad those images into (3 x 512) x 512 images with vertical
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 import os
-import scipy.misc
-from PIL import Image
 from skimage import io
 from skimage.util import pad
 
@@ -39,7 +36,7 @@ for images in os.listdir(image_dir):
         io.imsave(save_name, img_paded)
 
 # Change the names in the label file
-label_file = pd.read_csv(label_file_name, header=None, index_col=0, sep=',', dtype='str',names=['labels'])
+label_file = pd.read_csv(label_file_name, header=None, index_col=0, sep=',', dtype='str', names=['labels'])
 label_file.info()
 labels_list = []
 for i in range(3):
