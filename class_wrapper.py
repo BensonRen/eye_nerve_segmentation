@@ -193,20 +193,42 @@ class Network(object):
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
             epoch_samples += inputs.size(0)
-            IoU = self.compute_iou(logit, labels)
-            
-            self.print_metrics(metrics, epoch_samples, 'training')
-            print('IoU in current epoch is', IoU)
 
-            self.log.add_scalar('Loss/bce', metrics['bce'], epoch)
-            self.log.add_scalar('Loss/dice', metrics['dice'], epoch)
-            self.log.add_scalar('Loss/loss', metrics['loss'], epoch)
-            self.log.add_scalar('IoU', IoU, epoch)
-             
+            if epoch % self.flags.eval_step:
+                IoU = self.compute_iou(logit, labels)
+                self.print_metrics(metrics, epoch_samples, 'training')
+                print('training IoU in current epoch is', IoU)
+                self.log.add_scalar('training/bce', metrics['bce'], epoch)
+                self.log.add_scalar('training/dice', metrics['dice'], epoch)
+                self.log.add_scalar('training/loss', metrics['loss'], epoch)
+                self.log.add_scalar('training/IoU', IoU, epoch)
+                # Set eval mode
+                self.model.eval()
+                # Set to Training Mode
+                epoch_samples = 0
+                test_metrics = defaultdict(float)
+                for j, sample in enumerate(self.test_loader):
+                    inputs = sample['image']                                # Get the input
+                    labels = sample['labels']                               # Get the labels
+                    if cuda:
+                        inputs = inputs.cuda()                              # Put data onto GPU
+                        labels = labels.cuda()                              # Put data onto GPU
+                    self.optm.zero_grad()                                   # Zero the gradient first
+                    logit = self.model(inputs.float())                        # Get the output
+                    loss = self.make_loss(logit, labels, test_metrics)               # Get the loss tensor
+                IoU = self.compute_iou(logit, labels)
+                self.print_metrics(metrics, epoch_samples, 'training')
+                print('IoU in current epoch is', IoU)
+                self.log.add_scalar('test/bce', test_metrics['bce'], epoch)
+                self.log.add_scalar('test/dice', test_metrics['dice'], epoch)
+                self.log.add_scalar('test/loss', test_metrics['loss'], epoch)
+                self.log.add_scalar('test/IoU', IoU, epoch)
+
             if loss < self.best_validation_loss:
                 self.best_validation_loss = loss
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
+
         self.log.close()
         tk.record(1)                    # Record at the end of the training
 

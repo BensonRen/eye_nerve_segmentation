@@ -19,10 +19,11 @@ scikit-learn
 - [x] Debug and run the training module
 - [x] Work on GPU version of minimal training product
 - [x] Add loss monitoring
-- [ ] Solve the environment issue
+- [x] Solve the environment issue
+- [x] Add evaluation module
+- [x] Split the dataset
+- [ ] Debug the train test split and pre-processing
 - [ ] Try full datasets training
-- [ ] Add evaluation module
-- [ ] Split the dataset
 
 
 
