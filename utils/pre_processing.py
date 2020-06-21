@@ -11,9 +11,9 @@ import os
 from skimage import io
 from skimage.util import pad
 
-image_dir = ''
-output_dir = './'
-label_file_name = ''
+image_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
+output_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
+label_file_name = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
 x_len = 512
 
 # Change all the images in image_dir into images__[0,1,2] in output_dir
@@ -28,7 +28,8 @@ for images in os.listdir(image_dir):
     # for each of them
     for ind, img_new in enumerate(img_list):
         # Get save name
-        save_name = output_dir + images[:-4] + '__{}'.format(ind) + images[-4:]
+        save_name = os.path.join(output_dir,images[:-4] + '__{}'.format(ind) + images[-4:])
+        print(save_name)
         # Pad them into square
         img_paded = pad(img_new, ((8, 8), (0, 0)), mode='symmetric')
         assert np.shape(img_paded) == (x_len, x_len)
@@ -49,6 +50,6 @@ for i in range(3):
     labels_list.append(labels_new)
 label_file = pd.concat(labels_list, ignore_index=True)
 label_file.to_csv(label_file_name)
-print(label_file)
+#print(label_file)
 
 

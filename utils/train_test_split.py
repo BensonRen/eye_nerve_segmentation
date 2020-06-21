@@ -10,9 +10,10 @@ import shutil
 import os
 
 # Define some names and constants
-file_name =  '/work/sr365/OCT_bscans_raw/label_file.csv'
+file_name = '/work/sr365/OCT_bscans_raw/label_file.csv'
 img_dir = '/work/sr365/OCT_bscans_raw/raw_bscans'
 target_test_folder = '/work/sr365/OCT_bscans_raw/test'
+
 test_index = 5480
 
 # Read the file
