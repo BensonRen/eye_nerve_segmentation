@@ -25,6 +25,7 @@ scikit-learn
 - [x] Change the epoch based training into mini-batch based training
 - [x] Debug the train test split and pre-processing
 - [x] Try full datasets training
+- [x] Change the time recorder from epoch base to batch-base
 - [ ] Debug the full dataset training bottleneck
 
 

@@ -14,10 +14,10 @@ CUT_SQUARE = False
 #LABEL_FILE = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
 
 # Small set
-TRAIN_ROOT_DIR = '/work/sr365/OCT_bscans_raw/small_set10/train'
-TRAIN_LABEL_FILE = '/work/sr365/OCT_bscans_raw/small_set10/train/label_file.csv'
-TEST_ROOT_DIR = '/work/sr365/OCT_bscans_raw/small_set10/test'
-TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/small_set10/test/label_file.csv'
+#TRAIN_ROOT_DIR = '/work/sr365/OCT_bscans_raw/small_set10/train'
+#TRAIN_LABEL_FILE = '/work/sr365/OCT_bscans_raw/small_set10/train/label_file.csv'
+#TEST_ROOT_DIR = '/work/sr365/OCT_bscans_raw/small_set10/test'
+#TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/small_set10/test/label_file.csv'
 
 # Big set
 TRAIN_ROOT_DIR = '/work/sr365/OCT_bscans_raw/train'
@@ -33,10 +33,10 @@ MAX_TEST_SAMPLE = 40
 LEARN_RATE = 0.001
 LR_DECAY_RATE = 0.5
 STOP_THRESHOLD = 0.0001
-BATCH_SIZE = 1
+BATCH_SIZE = 2
 OPTIM = 'Adam'
 REG_SCALE = 5e-4
-EVAL_STEP = 1
+EVAL_STEP = 2
 MODEL_NAME = None
 
 

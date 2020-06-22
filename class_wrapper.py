@@ -197,6 +197,7 @@ class Network(object):
                 epoch_samples += inputs.size(0)
                 total_training_samples += inputs.size(0)
 
+                tk.record(j)                    # Record at the end of the training
                 # change from epoch base to mini-batch base
                 if j % self.flags.eval_step == 0:
                     IoU = self.compute_iou(logit, labels)
@@ -235,7 +236,6 @@ class Network(object):
                 self.best_validation_loss = loss.cpu().data.numpy()
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
-            tk.record(epoch)                    # Record at the end of the training
             
             if total_training_samples > self.flags.max_train_sample:
                 print("Maximum training samples requirement meet, I have been training for more than ", total_training_samples, " samples.")
