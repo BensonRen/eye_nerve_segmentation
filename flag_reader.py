@@ -30,6 +30,8 @@ def read_flag():
     parser.add_argument('--batch-size', default=BATCH_SIZE, type=int, help='batch size (100)')
     parser.add_argument('--eval-step', default=EVAL_STEP, type=int, help='# steps between evaluations')
     parser.add_argument('--train-step', default=TRAIN_STEP, type=int, help='# steps to train on the dataSet')
+    parser.add_argument('--max-train-sample', default=MAX_TRAIN_SAMPLE, type=int, help='The maximum training samples to see')
+    parser.add_argument('--max-test-sample', default=MAX_TEST_SAMPLE, type=int, help='The maximum testing samples to see')
     parser.add_argument('--lr', default=LEARN_RATE, type=float, help='learning rate')
     parser.add_argument('--lr-decay-rate', default=LR_DECAY_RATE, type=float,
                         help='decay learn rate by multiplying this factor')

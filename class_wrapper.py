@@ -82,10 +82,10 @@ class Network(object):
         :return: the total loss
         """
         import torch.nn.functional as F
-        print("pred shape", np.shape(pred), "type", type(pred))
-        print("target shape", np.shape(target), "type", type(target))
-        print(pred)
-        print(target)
+        #print("pred shape", np.shape(pred), "type", type(pred))
+        #print("target shape", np.shape(target), "type", type(target))
+        #print(pred)
+        #print(target)
         bce = F.binary_cross_entropy_with_logits(pred, target)
         pred = torch.sigmoid(pred)
         dice = self.dice_loss(pred, target)
@@ -175,6 +175,8 @@ class Network(object):
         # Time keeping
         tk = time_keeper(time_keeping_file=os.path.join(self.ckpt_dir, 'training time.txt'))
 
+        # Set up the total number of training samples allowed to see
+        total_training_samples = 0
         for epoch in range(self.flags.train_step):
             # Set to Training Mode
             epoch_samples = 0
@@ -193,8 +195,10 @@ class Network(object):
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
                 epoch_samples += inputs.size(0)
+                total_training_samples += inputs.size(0)
 
-            if epoch % self.flags.eval_step:
+            # change from epoch base to  sample base
+            if j % self.flags.eval_step == 0:
                 IoU = self.compute_iou(logit, labels)
                 self.print_metrics(metrics, epoch_samples, 'training')
                 print('training IoU in current epoch is', IoU)
@@ -205,7 +209,7 @@ class Network(object):
                 # Set eval mode
                 self.model.eval()
                 # Set to Training Mode
-                epoch_samples = 0
+                test_epoch_samples = 0
                 test_metrics = defaultdict(float)
                 for j, sample in enumerate(self.test_loader):
                     inputs = sample['image']                                # Get the input
@@ -216,21 +220,29 @@ class Network(object):
                     self.optm.zero_grad()                                   # Zero the gradient first
                     logit = self.model(inputs.float())                        # Get the output
                     loss = self.make_loss(logit, labels, test_metrics)               # Get the loss tensor
-                IoU = self.compute_iou(logit, labels)
-                self.print_metrics(metrics, epoch_samples, 'training')
-                print('IoU in current epoch is', IoU)
-                self.log.add_scalar('test/bce', test_metrics['bce'], epoch)
-                self.log.add_scalar('test/dice', test_metrics['dice'], epoch)
-                self.log.add_scalar('test/loss', test_metrics['loss'], epoch)
-                self.log.add_scalar('test/IoU', IoU, epoch)
+                    test_epoch_samples += inputs.size(0)
+                    IoU = self.compute_iou(logit, labels)
+                    self.print_metrics(metrics, test_epoch_samples, 'testing')
+                    print('IoU in current test epoch is', IoU)
+                    self.log.add_scalar('test/bce', test_metrics['bce'], epoch)
+                    self.log.add_scalar('test/dice', test_metrics['dice'], epoch)
+                    self.log.add_scalar('test/loss', test_metrics['loss'], epoch)
+                    self.log.add_scalar('test/IoU', IoU, epoch)
+                    if test_epoch_samples > self.flags.max_test_sample:
+                        break;
 
             if loss.cpu().data.numpy() < self.best_validation_loss:
                 self.best_validation_loss = loss.cpu().data.numpy()
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
+            tk.record(epoch)                    # Record at the end of the training
+            
+            if total_training_samples > self.flags.max_train_sample:
+                print("Maximum training samples requirement meet, I have been training for more than ", total_training_samples, " samples.")
+                break;
 
         self.log.close()
-        tk.record(1)                    # Record at the end of the training
+        tk.record(999)                    # Record at the end of the training
 
         # Save the module at the end
         self.save()
