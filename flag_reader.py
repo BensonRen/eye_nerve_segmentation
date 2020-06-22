@@ -42,8 +42,10 @@ def read_flag():
     parser.add_argument('--img-l', type=int, default=IMG_L, help='Length of the image')
     parser.add_argument('--img-w', type=int, default=IMG_W, help='Width of the image')
     parser.add_argument('--num_workers', type=int, default=NUM_WORKERS, help='number of workers to  load the pictures')
-    parser.add_argument('--root-dir', type=str, default=ROOT_DIR, help='The Root directory to get the images')
-    parser.add_argument('--label-file', type=str, default=LABEL_FILE, help='The label file to get the list of names')
+    parser.add_argument('--train-root-dir', type=str, default=TRAIN_ROOT_DIR, help='The Root directory to get the images')
+    parser.add_argument('--train-label-file', type=str, default=TRAIN_LABEL_FILE, help='The label file to get the list of names')
+    parser.add_argument('--test-root-dir', type=str, default=TEST_ROOT_DIR, help='The Root directory to get the images')
+    parser.add_argument('--test-label-file', type=str, default=TEST_LABEL_FILE, help='The label file to get the list of names')
     parser.add_argument('--cut-square', type=bool, default=CUT_SQUARE, help='the flag to cut the image into 496 x 496')
 
 

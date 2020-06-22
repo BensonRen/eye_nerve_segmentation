@@ -1,18 +1,1 @@
 Anaconda3 3.5.2
-Traceback (most recent call last):
-  File "/hpc/group/collinslab/sr365/.conda/EyeSeg/lib/python3.7/shutil.py", line 566, in move
-    os.rename(src, real_dst)
-FileNotFoundError: [Errno 2] No such file or directory: '/work/sr365/OCT_bscans_raw/raw_bscans/SD1013_S_3585_0.jpg' -> '/work/sr365/OCT_bscans_raw/test/SD1013_S_3585_0.jpg'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "utils/train_test_split.py", line 21, in <module>
-    shutil.move(os.path.join(img_dir, labels['filejpg'][i]),  os.path.join(target_test_folder, labels['filejpg'][i]))
-  File "/hpc/group/collinslab/sr365/.conda/EyeSeg/lib/python3.7/shutil.py", line 580, in move
-    copy_function(src, real_dst)
-  File "/hpc/group/collinslab/sr365/.conda/EyeSeg/lib/python3.7/shutil.py", line 266, in copy2
-    copyfile(src, dst, follow_symlinks=follow_symlinks)
-  File "/hpc/group/collinslab/sr365/.conda/EyeSeg/lib/python3.7/shutil.py", line 120, in copyfile
-    with open(src, 'rb') as fsrc:
-FileNotFoundError: [Errno 2] No such file or directory: '/work/sr365/OCT_bscans_raw/raw_bscans/SD1013_S_3585_0.jpg'

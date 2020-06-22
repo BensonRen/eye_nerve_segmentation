@@ -11,9 +11,23 @@ import os
 from skimage import io
 from skimage.util import pad
 
-image_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
-output_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
-label_file_name = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
+mask_mode = True
+
+# sr365 small set
+image_dir = '/work/sr365/OCT_bscans_raw/test'
+output_dir = '/work/sr365/OCT_bscans_raw/test/split'
+label_file_name = '/work/sr365/OCT_bscans_raw/test/label_file.csv'
+# sr365 small set
+#image_dir = '/work/sr365/OCT_bscans_raw/small_set10/train'
+#output_dir = '/work/sr365/OCT_bscans_raw/small_set10/train/split'
+#label_file_name = '/work/sr365/OCT_bscans_raw/small_set10/test/label_file.csv'
+# mac small set
+#image_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
+#output_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
+#label_file_name = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
+if mask_mode:
+    image_dir = os.path.join(image_dir,'mask')
+    output_dir= os.path.join(image_dir,'split')
 x_len = 512
 
 # Change all the images in image_dir into images__[0,1,2] in output_dir
@@ -36,15 +50,20 @@ for images in os.listdir(image_dir):
         # Save it
         io.imsave(save_name, img_paded)
 
+# If mask mode, do nothing
+if mask_mode:
+    raise ValueError('Mask mode activated, therefore scipt stopped without changing names in label file')
+
 # Change the names in the label file
-label_file = pd.read_csv(label_file_name, header=None, index_col=0, sep=',', dtype='str', names=['labels'])
+col_name = 'filejpg'
+label_file = pd.read_csv(label_file_name, index_col=0, sep=',', dtype='str')
 label_file.info()
 labels_list = []
 for i in range(3):
     labels_new = label_file.copy()
-    for ind, lab in enumerate(labels_new['labels']):
+    for ind, lab in enumerate(labels_new[col_name]):
         lab = lab[:-4] + '__{}'.format(i) + '.jpg'
-        labels_new['labels'][ind] = lab
+        labels_new[col_name][ind] = lab
         #print(lab)
     #print(labels_new)
     labels_list.append(labels_new)

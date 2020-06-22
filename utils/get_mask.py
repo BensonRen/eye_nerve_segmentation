@@ -11,8 +11,8 @@ from shutil import copyfile
 from matplotlib.image import imsave
 
 # Read part of the label file to avoid the computer RAM explosion
-#labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv')
-labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv', nrows=10)
+labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv')
+#labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv', nrows=10)
 labels['filejpg'].to_csv(os.path.join('/work/sr365/OCT_bscans_raw','label_file.csv'))
 img_l, img_w = 1536, 496
 # Get the ilm and epr from data frame
@@ -33,7 +33,8 @@ for ind, figure_name in enumerate(labels['filejpg']):
         mask = (y_axis+1 > ilm.iloc[ind, i]) * (y_axis + 1 < epr.iloc[ind, i])
         bm[mask, i] = 1
     # Save the mask
-    save_name = os.path.join('/work/sr365/OCT_bscans_raw','small_set10','mask',figure_name)
+    save_name = os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans','mask',figure_name)
+    #save_name = os.path.join('/work/sr365/OCT_bscans_raw','small_set10','mask',figure_name)
     img = Image.fromarray(bm,'L')
     img.save(save_name)
-    copyfile(os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans',figure_name), os.path.join('/work/sr365/OCT_bscans_raw','small_set10',figure_name))
+    #copyfile(os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans',figure_name), os.path.join('/work/sr365/OCT_bscans_raw','small_set10',figure_name))

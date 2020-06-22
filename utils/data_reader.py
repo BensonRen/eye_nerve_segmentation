@@ -10,14 +10,18 @@ import numpy as np
 from skimage import io, transform
 
 class EyeDataset(Dataset):
-    def __init__(self, flags, transform=None):
+    def __init__(self, flags, transform=None,train=True):
         """
         The initialization function of the EyeDataset
         :param flags: The parameter flags
         :param transform: The transforms to apply
         """
-        self.root_dir = flags.root_dir
-        self.labels = pd.read_csv(flags.label_file, header=None, index_col=0).astype('str')
+        if train:
+            self.root_dir = flags.train_root_dir
+            self.labels = pd.read_csv(flags.train_label_file, index_col=0).astype('str')
+        else:
+            self.root_dir = flags.test_root_dir
+            self.labels = pd.read_csv(flags.test_label_file, index_col=0).astype('str')
         self.img_l, self.img_w = flags.img_l, flags.img_w
         self.cut_square = flags.cut_square
         self.transform = transform
@@ -69,7 +73,11 @@ class ToTensor(object):
                 'labels': torch.from_numpy(labels)}
 
 def read_data(flags):
-    trainSet = EyeDataset(flags, transform=ToTensor())
-    train_loader = DataLoader(trainSet, batch_size=flags.batch_size, shuffle=True)
-    test_loader = train_loader
+    trainSet = EyeDataset(flags, transform=ToTensor(),train=True)
+    train_loader = DataLoader(trainSet, batch_size=flags.batch_size, shuffle=True,
+                              num_workers=flags.num_workers)
+    # get test set
+    testSet = EyeDataset(flags, transform=ToTensor(),train=False)
+    test_loader = DataLoader(testSet, batch_size=flags.batch_size, shuffle=True,
+                              num_workers=flags.num_workers)
     return train_loader, test_loader

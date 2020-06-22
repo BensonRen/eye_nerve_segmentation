@@ -192,7 +192,7 @@ class Network(object):
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
-            epoch_samples += inputs.size(0)
+                epoch_samples += inputs.size(0)
 
             if epoch % self.flags.eval_step:
                 IoU = self.compute_iou(logit, labels)
@@ -224,8 +224,8 @@ class Network(object):
                 self.log.add_scalar('test/loss', test_metrics['loss'], epoch)
                 self.log.add_scalar('test/IoU', IoU, epoch)
 
-            if loss < self.best_validation_loss:
-                self.best_validation_loss = loss
+            if loss.cpu().data.numpy() < self.best_validation_loss:
+                self.best_validation_loss = loss.cpu().data.numpy()
             # Learning rate decay upon plateau
             self.lr_scheduler.step(loss)
 
