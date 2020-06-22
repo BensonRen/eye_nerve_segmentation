@@ -22,8 +22,10 @@ scikit-learn
 - [x] Solve the environment issue
 - [x] Add evaluation module
 - [x] Split the dataset
-- [ ] Debug the train test split and pre-processing
-- [ ] Try full datasets training
+- [x] Change the epoch based training into mini-batch based training
+- [x] Debug the train test split and pre-processing
+- [x] Try full datasets training
+- [ ] Debug the full dataset training bottleneck
 
 
 

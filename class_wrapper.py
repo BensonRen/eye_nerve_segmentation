@@ -197,39 +197,39 @@ class Network(object):
                 epoch_samples += inputs.size(0)
                 total_training_samples += inputs.size(0)
 
-            # change from epoch base to  sample base
-            if j % self.flags.eval_step == 0:
-                IoU = self.compute_iou(logit, labels)
-                self.print_metrics(metrics, epoch_samples, 'training')
-                print('training IoU in current epoch is', IoU)
-                self.log.add_scalar('training/bce', metrics['bce'], epoch)
-                self.log.add_scalar('training/dice', metrics['dice'], epoch)
-                self.log.add_scalar('training/loss', metrics['loss'], epoch)
-                self.log.add_scalar('training/IoU', IoU, epoch)
-                # Set eval mode
-                self.model.eval()
-                # Set to Training Mode
-                test_epoch_samples = 0
-                test_metrics = defaultdict(float)
-                for j, sample in enumerate(self.test_loader):
-                    inputs = sample['image']                                # Get the input
-                    labels = sample['labels']                               # Get the labels
-                    if cuda:
-                        inputs = inputs.cuda()                              # Put data onto GPU
-                        labels = labels.cuda()                              # Put data onto GPU
-                    self.optm.zero_grad()                                   # Zero the gradient first
-                    logit = self.model(inputs.float())                        # Get the output
-                    loss = self.make_loss(logit, labels, test_metrics)               # Get the loss tensor
-                    test_epoch_samples += inputs.size(0)
+                # change from epoch base to mini-batch base
+                if j % self.flags.eval_step == 0:
                     IoU = self.compute_iou(logit, labels)
-                    self.print_metrics(metrics, test_epoch_samples, 'testing')
-                    print('IoU in current test epoch is', IoU)
-                    self.log.add_scalar('test/bce', test_metrics['bce'], epoch)
-                    self.log.add_scalar('test/dice', test_metrics['dice'], epoch)
-                    self.log.add_scalar('test/loss', test_metrics['loss'], epoch)
-                    self.log.add_scalar('test/IoU', IoU, epoch)
-                    if test_epoch_samples > self.flags.max_test_sample:
-                        break;
+                    self.print_metrics(metrics, epoch_samples, 'training')
+                    print('training IoU in current epoch is', IoU)
+                    self.log.add_scalar('training/bce', metrics['bce'], j)
+                    self.log.add_scalar('training/dice', metrics['dice'], j)
+                    self.log.add_scalar('training/loss', metrics['loss'], j)
+                    self.log.add_scalar('training/IoU', IoU, j)
+                    # Set eval mode
+                    self.model.eval()
+                    # Set to Training Mode
+                    test_epoch_samples = 0
+                    test_metrics = defaultdict(float)
+                    for jj, sample in enumerate(self.test_loader):
+                        inputs = sample['image']                                # Get the input
+                        labels = sample['labels']                               # Get the labels
+                        if cuda:
+                            inputs = inputs.cuda()                              # Put data onto GPU
+                            labels = labels.cuda()                              # Put data onto GPU
+                        self.optm.zero_grad()                                   # Zero the gradient first
+                        logit = self.model(inputs.float())                        # Get the output
+                        loss = self.make_loss(logit, labels, test_metrics)               # Get the loss tensor
+                        test_epoch_samples += inputs.size(0)
+                        IoU = self.compute_iou(logit, labels)
+                        self.print_metrics(metrics, test_epoch_samples, 'testing')
+                        print('IoU in current test batch is', IoU)
+                        self.log.add_scalar('test/bce', test_metrics['bce'], j)
+                        self.log.add_scalar('test/dice', test_metrics['dice'], j)
+                        self.log.add_scalar('test/loss', test_metrics['loss'], j)
+                        self.log.add_scalar('test/IoU', IoU, j)
+                        if test_epoch_samples > self.flags.max_test_sample:
+                            break;
 
             if loss.cpu().data.numpy() < self.best_validation_loss:
                 self.best_validation_loss = loss.cpu().data.numpy()
