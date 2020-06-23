@@ -233,8 +233,8 @@ class Network(object):
                         #################################################
                         # 06.23 new feature of adding the training plot #
                         #################################################
-                        #self.plot_eval_graph(inputs.cpu().numpy(), logit.detach().cpu().numpy(),
-                        #                     labels.detach().cpu().numpy(), j)
+                        self.plot_eval_graph(inputs.cpu().numpy(), logit.detach().cpu().numpy(),
+                                             labels.detach().cpu().numpy(), j)
                         #raise Exception("Testing stop point for getting shapes")
                         
                         if test_epoch_samples > self.flags.max_test_sample:
@@ -266,9 +266,43 @@ class Network(object):
         print("shape of image numpy is", np.shape(image_numpy))
         print("shape of segment output is", np.shape(segment_output))
         print("shape of gt_segment is", np.shape(gt_segment))
-        # f = plt.figure()
+
+        ##########################################
+        # Plot the original image as a reference #
+        ##########################################
+        f = plt.figure()
+        plt.imshow(image_numpy[0, 0, :, :])
+        plt.title('original image')
+
+        ############################
+        # Plot the confusion image #
+        ############################
+        # Stage-1: new confusion map
+        g = plt.figure()
+        # Create the confusion map
+        confusion_map = np.zeros([512, 512, 3])
+        # Stage-2: add ground truth to the first channel
+        confusion_map[:, :, 0] = gt_segment[0, 0, :, :]
+        # Stage-3: add prediction map to the second channel and add legend
+        prediction = segment_output[0, 0, :, :] < segment_output[0, 1, :, :]
+        confusion_map[:, :, 1] = prediction
+        plt.imshow(confusion_map)
+        # Add the legend for different colors
+        plt.plot(0, 0, "s", c='y', label='True positive')
+        plt.plot(0, 0, "s", c='g', label='False positive')
+        plt.plot(0, 0, "s", c='k', label='True negative')
+        plt.plot(0, 0, "s", c='r', label='False positive')
+        plt.title('confusion map')
+        plt.legend()
+
+        # Stage-4: Add that to tensorboard
+        self.log.add_figure('Confusion Sample', g, global_step=batch_label)
+        self.log.add_figure('Original Image', f, global_step=batch_label)
+        """
+        # The debugging phase
         np.save('image.npy', image_numpy)
         np.save('segment_out.npy', segment_output)
         np.save('gt_segment.npy', gt_segment)
+        """
 
 

@@ -35,6 +35,6 @@ for ind, figure_name in enumerate(labels['filejpg']):
     # Save the mask
     save_name = os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans','mask',figure_name)
     #save_name = os.path.join('/work/sr365/OCT_bscans_raw','small_set10','mask',figure_name)
-    img = Image.fromarray(bm,'L')
+    img = Image.fromarray(bm, 'L')
     img.save(save_name)
     #copyfile(os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans',figure_name), os.path.join('/work/sr365/OCT_bscans_raw','small_set10',figure_name))
