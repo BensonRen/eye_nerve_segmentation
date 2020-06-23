@@ -229,6 +229,8 @@ class Network(object):
                         self.log.add_scalar('test/dice', test_metrics['dice'], j)
                         self.log.add_scalar('test/loss', test_metrics['loss'], j)
                         self.log.add_scalar('test/IoU', IoU, j)
+                        self.plot_eval_graph(inputs.cpu().numpy()[0, :], logit.cpu().numpy()[0, :],
+                                             labels.cpu().numpy()[0, :], j)
                         if test_epoch_samples > self.flags.max_test_sample:
                             break;
 
@@ -246,5 +248,21 @@ class Network(object):
 
         # Save the module at the end
         self.save()
+
+    def plot_eval_graph(self, image_numpy, segment_output, gt_segment, batch_label):
+        """
+        The function to plot the evaluation figure to see the result
+        :param image_numpy: The image tensor input [numpy array]
+        :param segment_output: The segmented output from the network [numpy array]
+        :param gt_segment:  The grount truth segmentation result [numpy array]
+        :return: None, the graph plotted would be added to the tensorboard instead of returned
+        """
+        print("shape of image numpy is", np.shape(image_numpy))
+        print("shape of segment output is", np.shape(segment_output))
+        print("shape of gt_segment is", np.shape(gt_segment))
+        # f = plt.figure()
+        np.save('image.npy', image_numpy)
+        np.save('segment_out.npy', segment_output)
+        np.save('gt_segment.npy', gt_segment)
 
 
