@@ -229,8 +229,10 @@ class Network(object):
                         self.log.add_scalar('test/dice', test_metrics['dice'], j)
                         self.log.add_scalar('test/loss', test_metrics['loss'], j)
                         self.log.add_scalar('test/IoU', IoU, j)
-                        self.plot_eval_graph(inputs.cpu().numpy()[0, :], logit.cpu().numpy()[0, :],
-                                             labels.cpu().numpy()[0, :], j)
+                        self.plot_eval_graph(inputs.cpu().numpy(), logit.detach().cpu().numpy(),
+                                             labels.detach().cpu().numpy(), j)
+                        raise Exception("Testing stop point for getting shapes")
+                        
                         if test_epoch_samples > self.flags.max_test_sample:
                             break;
 

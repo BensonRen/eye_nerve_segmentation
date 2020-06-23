@@ -14,8 +14,8 @@ from skimage.util import pad
 mask_mode = True
 
 # sr365 small set
-image_dir = '/work/sr365/OCT_bscans_raw/train'
-output_dir = '/work/sr365/OCT_bscans_raw/train/split'
+image_dir = '/work/sr365/OCT_bscans_raw/raw_bscans/mask'
+output_dir = '/work/sr365/OCT_bscans_raw/train/mask'
 label_file_name = '/work/sr365/OCT_bscans_raw/train/label_file.csv'
 # sr365 small set
 #image_dir = '/work/sr365/OCT_bscans_raw/small_set10/train'
@@ -25,9 +25,13 @@ label_file_name = '/work/sr365/OCT_bscans_raw/train/label_file.csv'
 #image_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
 #output_dir = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
 #label_file_name = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
-if mask_mode:
-    image_dir = os.path.join(image_dir,'mask')
-    output_dir= os.path.join(image_dir,'split')
+
+
+#if mask_mode:
+#    image_dir = os.path.join(image_dir,'mask')
+#    output_dir= os.path.join(image_dir,'split')
+
+
 x_len = 512
 
 # Change all the images in image_dir into images__[0,1,2] in output_dir

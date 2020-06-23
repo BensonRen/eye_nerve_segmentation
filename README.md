@@ -9,6 +9,20 @@ pandas
 scipy
 scikit-learn
 
+## Data Pre-processing procedure
+1. Get the binary mask from the .csv file (image size [496 x 1536]
+```
+python utils/get_mask.py
+```
+2. Split the training and testing sets manually by patient id (top 5480 images)
+```
+python utils/train_test_split.py
+```
+3. Pre-process the each image and binary mask into 512 x 512 by cutting into 3 pieces and mirror symmetric padding
+```
+python utils/pre_processing.py
+```
+
 
 ## To-do list: 
 - [x] make the README file explaining the project 
@@ -26,6 +40,8 @@ scikit-learn
 - [x] Debug the train test split and pre-processing
 - [x] Try full datasets training
 - [x] Change the time recorder from epoch base to batch-base
+- [ ] Add the plotting module during training and output plotting to the tensorboard
+- [ ] Debug the problem of output segmentation map is all 0 or 1
 - [ ] Debug the full dataset training bottleneck
 
 

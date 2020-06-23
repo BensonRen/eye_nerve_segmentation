@@ -13,7 +13,7 @@ from matplotlib.image import imsave
 # Read part of the label file to avoid the computer RAM explosion
 labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv')
 #labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv', nrows=10)
-labels['filejpg'].to_csv(os.path.join('/work/sr365/OCT_bscans_raw','label_file.csv'))
+#labels['filejpg'].to_csv(os.path.join('/work/sr365/OCT_bscans_raw','label_file.csv'))
 img_l, img_w = 1536, 496
 # Get the ilm and epr from data frame
 ilm = labels[['ilm{}'.format(i+1) for i in range(img_l)]]
@@ -28,10 +28,10 @@ print("number of examples", len(labels))
 # Read the images according to the image file name from label file
 for ind, figure_name in enumerate(labels['filejpg']):
     print("Reading picture", figure_name)
-    bm = np.zeros([img_w, img_l])
+    bm = np.zeros([img_w, img_l], dtype=np.uint8)
     for i in range(img_l):
         mask = (y_axis+1 > ilm.iloc[ind, i]) * (y_axis + 1 < epr.iloc[ind, i])
-        bm[mask, i] = 1
+        bm[mask, i] = 255
     # Save the mask
     save_name = os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans','mask',figure_name)
     #save_name = os.path.join('/work/sr365/OCT_bscans_raw','small_set10','mask',figure_name)
