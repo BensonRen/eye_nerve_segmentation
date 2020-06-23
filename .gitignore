@@ -2,4 +2,5 @@
 models/*
 **.sh
 **.err
+**.npy
 

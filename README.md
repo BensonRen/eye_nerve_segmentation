@@ -3,11 +3,13 @@
 ## A project collaboration with Med school to segment the eye nerve from eye CT scans
 
 ## Dependencies
-Pytorch
-Torchvision
-pandas
-scipy
-scikit-learn
+| Package|
+|:--:|
+|Pytorch|
+|Torchvision|
+|pandas|
+|scipy|
+|scikit-learn|
 
 ## Data Pre-processing procedure
 1. Get the binary mask from the .csv file (image size [496 x 1536]
