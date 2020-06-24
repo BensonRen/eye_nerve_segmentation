@@ -16,7 +16,7 @@ class ResNetUNet(nn.Module):
     def __init__(self, flags, n_class=2):
         super().__init__()
 
-        self.base_model = models.resnet18(pretrained=True)
+        self.base_model = models.resnet18(pretrained=flags.pretrain)
         self.base_layers = list(self.base_model.children())
 
         self.layer0 = nn.Sequential(*self.base_layers[:3]) # size=(N, 64, x.H/2, x.W/2)

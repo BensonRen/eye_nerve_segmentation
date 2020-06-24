@@ -42,8 +42,9 @@ python utils/pre_processing.py
 - [x] Debug the train test split and pre-processing
 - [x] Try full datasets training
 - [x] Change the time recorder from epoch base to batch-base
-- [ ] Add the plotting module during training and output plotting to the tensorboard
-- [ ] Debug the problem of output segmentation map is all 0 or 1
+- [x] Add the plotting module during training and output plotting to the tensorboard
+- [x] Debug the problem of output segmentation map is all 0 or 1
+- [ ] Debug confusion matrix plot generating 
 - [ ] Debug the full dataset training bottleneck
 
 

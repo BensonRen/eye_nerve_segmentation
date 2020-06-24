@@ -26,6 +26,7 @@ def read_flag():
 
     # Optimizer Params
     parser.add_argument('--optim', default=OPTIM, type=str, help='the type of optimizer that you want to use')
+    parser.add_argument('--pretrain', default=PRETRAIN, type=str, help='the option to use pretrained model or not')
     parser.add_argument('--reg-scale', type=float, default=REG_SCALE, help='#scale for regularization of dense layers')
     parser.add_argument('--batch-size', default=BATCH_SIZE, type=int, help='batch size (100)')
     parser.add_argument('--eval-step', default=EVAL_STEP, type=int, help='# steps between evaluations')

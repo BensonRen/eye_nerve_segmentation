@@ -8,7 +8,7 @@ IMG_L = 512
 IMG_W = 512
 NUM_WORKERS = 8
 CUT_SQUARE = False
-
+PRETRAIN = False
 # Mac set
 #ROOT_DIR = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
 #LABEL_FILE = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
@@ -36,10 +36,10 @@ STOP_THRESHOLD = 0.0001
 BATCH_SIZE = 2
 OPTIM = 'Adam'
 REG_SCALE = 5e-4
-EVAL_STEP = 10
+EVAL_STEP = 20
 MODEL_NAME = None
 
 
-# Test ratio
+# Test ratio (Currently this flag value is useless because the patien id issue)
 TEST_RATIO = 0.2
 
