@@ -29,14 +29,14 @@ TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/test/label_file.csv'
 # Training related parameters
 TRAIN_STEP = 5
 MAX_TRAIN_SAMPLE = 5000
-MAX_TEST_SAMPLE = 40
+MAX_TEST_SAMPLE = 5
 LEARN_RATE = 0.001
 LR_DECAY_RATE = 0.5
 STOP_THRESHOLD = 0.0001
 BATCH_SIZE = 2
 OPTIM = 'Adam'
 REG_SCALE = 5e-4
-EVAL_STEP = 20
+EVAL_STEP = 5
 MODEL_NAME = None
 
 

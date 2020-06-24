@@ -44,7 +44,8 @@ python utils/pre_processing.py
 - [x] Change the time recorder from epoch base to batch-base
 - [x] Add the plotting module during training and output plotting to the tensorboard
 - [x] Debug the problem of output segmentation map is all 0 or 1
-- [ ] Debug confusion matrix plot generating 
+- [x] Debug confusion matrix plot generating 
+- [x] Change the target mask from [1,0] structure to [0, 1] structure so the confusion plot better reflects the IoU values
 - [ ] Debug the full dataset training bottleneck
 
 

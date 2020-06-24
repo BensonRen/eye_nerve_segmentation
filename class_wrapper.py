@@ -58,7 +58,7 @@ class Network(object):
         cuda = True if torch.cuda.is_available() else False
         if cuda:
             model.cuda()
-        summary(model, input_size=(3, 224, 224))
+        summary(model, input_size=(3, 512, 512))
         print(model)
         return model
 
@@ -278,9 +278,9 @@ class Network(object):
         # Create the confusion map
         confusion_map = np.zeros([512, 512, 3])
         # Stage-2: add ground truth to the first channel
-        confusion_map[:, :, 0] = gt_segment[0, 0, :, :]
+        confusion_map[:, :, 0] = gt_segment[0, 1, :, :]
         # Stage-3: add prediction map to the second channel and add legend
-        prediction = segment_output[0, 0, :, :] < segment_output[0, 1, :, :]
+        prediction = segment_output[0, 1, :, :] > segment_output[0, 0, :, :]
         confusion_map[:, :, 1] = prediction
         plt.imshow(confusion_map)
         # Add the legend for different colors
