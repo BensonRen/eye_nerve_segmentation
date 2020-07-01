@@ -25,6 +25,24 @@ python utils/train_test_split.py
 python utils/pre_processing.py
 ```
 
+## Time profile results
+To address the training time consumption issue (takes about 30s to train on each image), a time profiling job is done both using the Cprofiler and the manual checkpoints added to the program. The Cprofiler outputs around 19M function calls, which is not very readable by human. Therefore the table of manual checkpoints are recorded below.
+
+| Operation | Approximate Time taken|
+|:---------:|:---------------------:|
+|enter epoch, set up metric holder| 0.012 s|
+|set model to train state| 0.03s|
+|take the grouped data point from train loader| 0.85s|
+|get the image and binary mask from the grouped data point | 0.01s|
+|put the img and mask on gpu| 0.01s|
+|zero the gradient| 0.01 s|
+|logit=model(img)| 12.2s|
+|make loss| 0.1s|
+|loss.backward()|20s|
+|optm.step()|0.2s|
+|adding training samples|0.02s|
+|calculate IoU and adding losses to tensorboard|0.06s|
+|change model to evaluation mode|0.03s|
 
 ## To-do list: 
 - [x] make the README file explaining the project 
@@ -46,6 +64,8 @@ python utils/pre_processing.py
 - [x] Debug the problem of output segmentation map is all 0 or 1
 - [x] Debug confusion matrix plot generating 
 - [x] Change the target mask from [1,0] structure to [0, 1] structure so the confusion plot better reflects the IoU values
+- [x] Time profiling to find the training bottleneck issue
+- [ ] Check RAM issue if that is causing the program to slow down
 - [ ] Debug the full dataset training bottleneck
 
 

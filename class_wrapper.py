@@ -177,27 +177,43 @@ class Network(object):
 
         # Set up the total number of training samples allowed to see
         total_training_samples = 0
+        train_end_flag = False
+        tk.record(0)                    # Record at the end of the training
         for epoch in range(self.flags.train_step):
+            tk.record(1)                    # Record at the end of the training
+            if train_end_flag:          # Training is ended due to max sample reached
+                break;
             # Set to Training Mode
             epoch_samples = 0
             metrics = defaultdict(float)
+            tk.record(2)                    # Record at the end of the training
             # boundary_loss = 0                 # Unnecessary during training since we provide geometries
             self.model.train()
+            tk.record(3)                    # Record at the end of the training
             for j, sample in enumerate(self.train_loader):
+                tk.record(4)                    # Record at the end of the training
                 inputs = sample['image']                                # Get the input
                 labels = sample['labels']                               # Get the labels
+                tk.record(5)                    # Record at the end of the training
                 if cuda:
                     inputs = inputs.cuda()                              # Put data onto GPU
                     labels = labels.cuda()                              # Put data onto GPU
+                tk.record(6)                    # Record at the end of the training
                 self.optm.zero_grad()                                   # Zero the gradient first
+                tk.record(7)                    # Record at the end of the training
                 logit = self.model(inputs.float())                        # Get the output
+                tk.record(8)                    # Record at the end of the training
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
+                tk.record(9)                    # Record at the end of the training
                 loss.backward()                                     # Calculate the backward gradients
+                tk.record(10)                    # Record at the end of the training
                 self.optm.step()                                    # Move one step the optimizer
+                tk.record(11)                    # Record at the end of the training
                 epoch_samples += inputs.size(0)
                 total_training_samples += inputs.size(0)
 
-                tk.record(j)                    # Record at the end of the training
+                tk.record(12)                    # Record at the end of the training
+                #tk.record(j)                    # Record at the end of the training
                 # change from epoch base to mini-batch base
                 if j % self.flags.eval_step == 0:
                     IoU = self.compute_iou(logit, labels)
@@ -207,8 +223,10 @@ class Network(object):
                     self.log.add_scalar('training/dice', metrics['dice']/epoch_samples, j)
                     self.log.add_scalar('training/loss', metrics['loss']/epoch_samples, j)
                     self.log.add_scalar('training/IoU', IoU, j)
+                    tk.record(13)                    # Record at the end of the training
                     # Set eval mode
                     self.model.eval()
+                    tk.record(14)                    # Record at the end of the training
                     # Set to Training Mode
                     test_epoch_samples = 0
                     test_metrics = defaultdict(float)
@@ -236,14 +254,15 @@ class Network(object):
                         #raise Exception("Testing stop point for getting shapes")
                         
 
-            if loss.cpu().data.numpy() < self.best_validation_loss:
-                self.best_validation_loss = loss.cpu().data.numpy()
-            # Learning rate decay upon plateau
-            self.lr_scheduler.step(loss)
+                if loss.cpu().data.numpy() < self.best_validation_loss:
+                    self.best_validation_loss = loss.cpu().data.numpy()
+                # Learning rate decay upon plateau
+                self.lr_scheduler.step(loss)
             
-            if total_training_samples > self.flags.max_train_sample:
-                print("Maximum training samples requirement meet, I have been training for more than ", total_training_samples, " samples.")
-                break;
+                if total_training_samples > self.flags.max_train_sample:
+                    print("Maximum training samples requirement meet, I have been training for more than ", total_training_samples, " samples.")
+                    train_end_flag = True
+                    break;
 
         self.log.close()
         tk.record(999)                    # Record at the end of the training
@@ -259,9 +278,9 @@ class Network(object):
         :param gt_segment:  The grount truth segmentation result [numpy array]
         :return: None, the graph plotted would be added to the tensorboard instead of returned
         """
-        print("shape of image numpy is", np.shape(image_numpy))
-        print("shape of segment output is", np.shape(segment_output))
-        print("shape of gt_segment is", np.shape(gt_segment))
+        #print("shape of image numpy is", np.shape(image_numpy))
+        #print("shape of segment output is", np.shape(segment_output))
+        #print("shape of gt_segment is", np.shape(gt_segment))
 
         ##########################################
         # Plot the original image as a reference #

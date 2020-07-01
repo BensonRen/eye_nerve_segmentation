@@ -6,9 +6,9 @@ Params for Back propagation model
 #IMG_W = 448
 IMG_L = 512
 IMG_W = 512
-NUM_WORKERS = 8
+NUM_WORKERS = 4
 CUT_SQUARE = False
-PRETRAIN = False
+PRETRAIN = True
 # Mac set
 #ROOT_DIR = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
 #LABEL_FILE = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
@@ -28,7 +28,7 @@ TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/test/label_file.csv'
 
 # Training related parameters
 TRAIN_STEP = 5
-MAX_TRAIN_SAMPLE = 5000
+MAX_TRAIN_SAMPLE = 20
 MAX_TEST_SAMPLE = 5
 LEARN_RATE = 0.001
 LR_DECAY_RATE = 0.5
