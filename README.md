@@ -28,6 +28,7 @@ python utils/pre_processing.py
 ## Time profile results
 To address the training time consumption issue (takes about 30s to train on each image), a time profiling job is done both using the Cprofiler and the manual checkpoints added to the program. The Cprofiler outputs around 19M function calls, which is not very readable by human. Therefore the table of manual checkpoints are recorded below.
 
+### Time performance on training function level
 | Operation | Approximate Time taken|
 |:---------:|:---------------------:|
 |enter epoch, set up metric holder| 0.012 s|
@@ -43,6 +44,40 @@ To address the training time consumption issue (takes about 30s to train on each
 |adding training samples|0.02s|
 |calculate IoU and adding losses to tensorboard|0.06s|
 |change model to evaluation mode|0.03s|
+
+### Time performance on forward model level
+| Operation(in channel, out channel, kernelsize, padding) | Approximate Time taken|
+|:---------:|:---------------------:|
+|conv(3,64,3,1)+relu| 0.2s|
+|conv(64,64,3,1)+relu| 1.5s|
+|First 3 layer of ResNet 18| 0.1s|
+|4-5 layer of ResNet 18| 0.4s|
+|6th layer of ResNet 18| 0.4s|
+|7th layer of ResNet 18| 0.16s|
+|8th layer of ResNet 18| 0.15s|
+|conv(512,512,1,0)+relu| 0.01s|
+|Upsample 2 times| 0.01s|
+|conv(256,256,1,0)+relu| 0.01s|
+|concatenate | 0.01s|
+|conv(256+512,512,3,1)+relu| 0.2s|
+|Upsample 2 times| 0.05s|
+|conv(128,128,1,0)+relu| 0.01s|
+|concatenate | 0.01s|
+|conv(128+512,256,3,1)+relu| 0.4s|
+|Upsample 2 times| 0.08s|
+|conv(64,64,1,0)+relu| 0.01s|
+|concatenate | 0.02s|
+|conv(64+256,256,3,1)+relu| 1.88s|
+|Upsample 2 times| 0.6s|
+|conv(64,64,1,0)+relu| 0.05s|
+|concatenate | 0.05s|
+|conv(64+128,64,3,1)+relu| 4.4s|
+|Conv2d(64,2,1)|0.12s|
+
+
+
+
+|
 
 ## To-do list: 
 - [x] make the README file explaining the project 

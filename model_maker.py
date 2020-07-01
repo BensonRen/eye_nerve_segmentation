@@ -1,8 +1,10 @@
 """
 The model maker for Eye nerve segmentation project, copied from : https://github.com/usuyama/pytorch-unet
 """
+import os
 import torch
 import torch.nn as nn
+from utils.time_recorder import time_keeper
 from torchvision import models
 
 def convrelu(in_channels, out_channels, kernel, padding):
@@ -15,6 +17,8 @@ def convrelu(in_channels, out_channels, kernel, padding):
 class ResNetUNet(nn.Module):
     def __init__(self, flags, n_class=2):
         super().__init__()
+        # setting up the time keeper to do the prifling of the time
+        self.tk = time_keeper('forward_model_time.txt')
 
         self.base_model = models.resnet18(pretrained=flags.pretrain)
         self.base_layers = list(self.base_model.children())
@@ -44,40 +48,70 @@ class ResNetUNet(nn.Module):
         self.conv_last = nn.Conv2d(64, n_class, 1)
 
     def forward(self, input):
+        tk = self.tk
+        tk.record(0)
         x_original = self.conv_original_size0(input)
+        tk.record(1)
         x_original = self.conv_original_size1(x_original)
+        tk.record(2)
 
         layer0 = self.layer0(input)
+        tk.record(3)
         layer1 = self.layer1(layer0)
+        tk.record(4)
         layer2 = self.layer2(layer1)
+        tk.record(5)
         layer3 = self.layer3(layer2)
+        tk.record(6)
         layer4 = self.layer4(layer3)
+        tk.record(7)
 
         layer4 = self.layer4_1x1(layer4)
+        tk.record(8)
         x = self.upsample(layer4)
+        tk.record(9)
         layer3 = self.layer3_1x1(layer3)
+        tk.record(10)
         x = torch.cat([x, layer3], dim=1)
+        tk.record(11)
         x = self.conv_up3(x)
+        tk.record(12)
 
         x = self.upsample(x)
+        tk.record(13)
         layer2 = self.layer2_1x1(layer2)
+        tk.record(14)
         x = torch.cat([x, layer2], dim=1)
+        tk.record(15)
         x = self.conv_up2(x)
+        tk.record(16)
 
         x = self.upsample(x)
+        tk.record(17)
         layer1 = self.layer1_1x1(layer1)
+        tk.record(18)
         x = torch.cat([x, layer1], dim=1)
+        tk.record(19)
         x = self.conv_up1(x)
+        tk.record(20)
 
         x = self.upsample(x)
+        tk.record(21)
         layer0 = self.layer0_1x1(layer0)
+        tk.record(22)
         x = torch.cat([x, layer0], dim=1)
+        tk.record(23)
         x = self.conv_up0(x)
+        tk.record(24)
 
         x = self.upsample(x)
+        tk.record(25)
         x = torch.cat([x, x_original], dim=1)
+        tk.record(26)
         x = self.conv_original_size2(x)
+        tk.record(27)
 
         out = self.conv_last(x)
+        tk.record(28)
 
         return out
