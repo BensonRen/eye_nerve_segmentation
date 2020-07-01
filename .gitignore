@@ -1,4 +1,6 @@
 **__*
+*.swp
+*.txt
 models/*
 **.sh
 **.err

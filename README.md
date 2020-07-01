@@ -46,33 +46,37 @@ To address the training time consumption issue (takes about 30s to train on each
 |change model to evaluation mode|0.03s|
 
 ### Time performance on forward model level
-| Operation(in channel, out channel, kernelsize, padding) | Approximate Time taken|
-|:---------:|:---------------------:|
-|conv(3,64,3,1)+relu| 0.2s|
-|conv(64,64,3,1)+relu| 1.5s|
-|First 3 layer of ResNet 18| 0.1s|
-|4-5 layer of ResNet 18| 0.4s|
-|6th layer of ResNet 18| 0.4s|
-|7th layer of ResNet 18| 0.16s|
-|8th layer of ResNet 18| 0.15s|
-|conv(512,512,1,0)+relu| 0.01s|
-|Upsample 2 times| 0.01s|
-|conv(256,256,1,0)+relu| 0.01s|
-|concatenate | 0.01s|
-|conv(256+512,512,3,1)+relu| 0.2s|
-|Upsample 2 times| 0.05s|
-|conv(128,128,1,0)+relu| 0.01s|
-|concatenate | 0.01s|
-|conv(128+512,256,3,1)+relu| 0.4s|
-|Upsample 2 times| 0.08s|
-|conv(64,64,1,0)+relu| 0.01s|
-|concatenate | 0.02s|
-|conv(64+256,256,3,1)+relu| 1.88s|
-|Upsample 2 times| 0.6s|
-|conv(64,64,1,0)+relu| 0.05s|
-|concatenate | 0.05s|
-|conv(64+128,64,3,1)+relu| 4.4s|
-|Conv2d(64,2,1)|0.12s|
+| Operation(in channel, out channel, kernelsize, padding) | Approximate Time taken| Accumulate time|
+|:---------:|:---------------------:|:------------------------:|
+|model preparation| 0.47s| 0.47s|
+|conv(3,64,3,1)+relu| 0.2s| 0.68s|
+|conv(64,64,3,1)+relu| 1.5s|2.12s|
+|First 3 layer of ResNet 18| 0.16s|2.28s|
+|4-5 layer of ResNet 18| 0.4s|2.68s|
+|6th layer of ResNet 18| 0.4s|3.02s|
+|7th layer of ResNet 18| 0.16s|3.18s|
+|8th layer of ResNet 18| 0.15s|3.33s|
+|conv(512,512,1,0)+relu| 0.01s|3.34s|
+|Upsample 2 times| 0.01s|3.35s|
+|conv(256,256,1,0)+relu| 0.01s|3.36s|
+|concatenate | 0.01s|3.37s|
+|conv(256+512,512,3,1)+relu| 0.2s|3.57s|
+|Upsample 2 times| 0.05s|3.62s|
+|conv(128,128,1,0)+relu| 0.01s|3.63s|
+|concatenate | 0.01s|3.64s|
+|conv(128+512,256,3,1)+relu| 0.4s|4.02s|
+|Upsample 2 times| 0.08s|4.10s|
+|conv(64,64,1,0)+relu| 0.01s|4.11s|
+|concatenate | 0.02s|4.13s|
+|conv(64+256,256,3,1)+relu| 0.76s|4.89s|
+|Upsample 2 times| 0.65s|5.54s|
+|conv(64,64,1,0)+relu| 0.05s|5.59s|
+|concatenate | 0.05s|5.56s|
+|conv(64+256,128,3,1)+relu| 1.8s|7.53s|
+|Upsample 2 times| 0.7s| 8.21s|
+|concatenate|0.12s|8.33s|
+|conv(64+128, 64, 3, 1) +relu|4.4s|12.76s|
+|conv(64,2,1,0)|0.06s|12.82s|
 
 
 
