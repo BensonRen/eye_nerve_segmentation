@@ -218,7 +218,7 @@ class Network(object):
                     self.log.add_scalar('training/bce', metrics['bce']/epoch_samples, j)
                     self.log.add_scalar('training/dice', metrics['dice']/epoch_samples, j)
                     self.log.add_scalar('training/loss', metrics['loss']/epoch_samples, j)
-                    self.log.add_scalar('training/IoU', IoU_aggregate, j)
+                    self.log.add_scalar('training/IoU', IoU, j)
                     # Set eval mode
                     self.model.eval()
                     # Set to Training Mode
@@ -239,7 +239,7 @@ class Network(object):
                         iou_sum += IoU
                         if test_epoch_samples > self.flags.max_test_sample:
                             break
-                    IoU = iou_sum / test_epoch_samples
+                    IoU = iou_sum / jj
                     self.print_metrics(metrics, test_epoch_samples, 'testing')
                     print('IoU in current test batch is', IoU)
                     self.log.add_scalar('test/bce', test_metrics['bce']/test_epoch_samples, j)
