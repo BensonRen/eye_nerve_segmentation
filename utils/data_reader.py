@@ -39,9 +39,9 @@ class EyeDataset(Dataset):
 
         label_name = os.path.join(self.root_dir, 'mask', self.labels.iloc[idx, 0])
         labels = np.expand_dims(io.imread(label_name)>200, axis=0)              # 200 is the threshold for rounding
-        labels_inv = 1 - labels
+        #labels_inv = 1 - labels
         #labels_inv = np.logical_not(labels)
-        labels = np.concatenate([labels_inv, labels], axis=0)
+        #labels = np.concatenate([labels_inv, labels], axis=0)
         image = io.imread(img_name)
         #print("shape of read labels", np.shape(labels))
         #print("shape of read image", np.shape(image))

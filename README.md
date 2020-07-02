@@ -104,8 +104,9 @@ To address the training time consumption issue (takes about 30s to train on each
 - [x] Debug confusion matrix plot generating 
 - [x] Change the target mask from [1,0] structure to [0, 1] structure so the confusion plot better reflects the IoU values
 - [x] Time profiling to find the training bottleneck issue
-- [ ] Check RAM issue if that is causing the program to slow down
-- [ ] Debug the full dataset training bottleneck
+- [x] Check RAM issue if that is causing the program to slow down
+- [x] Debug the full dataset training bottleneck
+- [ ] Full set IoU evaluation instead of single image ones
 
 
 

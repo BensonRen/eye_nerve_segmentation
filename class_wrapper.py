@@ -19,7 +19,7 @@ from torch.optim import lr_scheduler
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from sklearn.metrics import jaccard_similarity_score as jsc
+from sklearn.metrics import jaccard_score as jsc
 
 # Own module
 from utils.time_recorder import time_keeper
@@ -67,7 +67,11 @@ class Network(object):
         target = target.contiguous()
 
         intersection = (pred * target).sum(dim=2).sum(dim=2)
-
+        #print("start of pred", pred.detach().cpu().numpy()[0,:,0,0])
+        #print("mean of pred", np.mean(pred.detach().cpu().numpy()))
+        #print("mean of target", np.mean(target.detach().cpu().numpy()))
+        #print("shape of target", np.shape(target.detach().cpu().numpy()))
+        #print("shape of pred", np.shape(pred.detach().cpu().numpy()))
         loss = (1 - ((2. * intersection + smooth) / (
                     pred.sum(dim=2).sum(dim=2) + target.sum(dim=2).sum(dim=2) + smooth)))
 
@@ -87,9 +91,12 @@ class Network(object):
         #print(pred)
         #print(target)
         bce = F.binary_cross_entropy_with_logits(pred, target)
-        pred = torch.sigmoid(pred)
-        dice = self.dice_loss(pred, target)
-        loss = bce * bce_weight + dice * (1 - bce_weight)
+        #print("start of pred", pred.detach().cpu().numpy()[0, :, 0, 0])
+        pred_sigmoid = torch.sigmoid(pred)
+        #print("start of pred_sigmoid", pred_sigmoid.detach().cpu().numpy()[0, :, 0, 0])
+        dice = self.dice_loss(pred_sigmoid, target)
+        loss = bce
+        #loss = bce * bce_weight + dice * (1 - bce_weight)
 
         metrics['bce'] += bce.data.cpu().numpy() * target.size(0)
         metrics['dice'] += dice.data.cpu().numpy() * target.size(0)
@@ -101,11 +108,11 @@ class Network(object):
         """
         Compute the IOU
         """
-        print("shape of the original prediction", np.shape(pred.cpu().data.numpy()))
-        lbl = pred.cpu().data.numpy()[:,0,:,:].reshape(-1) > 0
-        tgt = target.cpu().data.numpy()[:,0,:,:].reshape(-1)
-        print("shape of lbl in compute iou", np.shape(lbl))
-        print("shape of tgt in compute iou", np.shape(tgt))
+        #print("shape of the original prediction", np.shape(pred.cpu().data.numpy()))
+        lbl = pred.cpu().data.numpy().reshape(-1) > 0
+        tgt = target.cpu().data.numpy().reshape(-1)
+        #print("shape of lbl in compute iou", np.shape(lbl))
+        #print("shape of tgt in compute iou", np.shape(tgt))
         return jsc(tgt, lbl)
 
     def print_metrics(self, metrics, epoch_samples, phase):
@@ -138,7 +145,7 @@ class Network(object):
         """
         return lr_scheduler.ReduceLROnPlateau(optimizer=optm, mode='min',
                                               factor=self.flags.lr_decay_rate,
-                                              patience=10, verbose=True, threshold=1e-4)
+                                              patience=100, verbose=True, threshold=1e-4)
 
     def save(self):
         """
@@ -178,58 +185,46 @@ class Network(object):
         # Set up the total number of training samples allowed to see
         total_training_samples = 0
         train_end_flag = False
-        #tk.record(0)                    # Record at the end of the training
         for epoch in range(self.flags.train_step):
-            #tk.record(1)                    # Record at the end of the training
             if train_end_flag:          # Training is ended due to max sample reached
                 break;
             # Set to Training Mode
             epoch_samples = 0
             metrics = defaultdict(float)
-            #tk.record(2)                    # Record at the end of the training
-            # boundary_loss = 0                 # Unnecessary during training since we provide geometries
             self.model.train()
-            #tk.record(3)                    # Record at the end of the training
+            iou_sum_train = 0
             for j, sample in enumerate(self.train_loader):
-                #tk.record(4)                    # Record at the end of the training
                 inputs = sample['image']                                # Get the input
                 labels = sample['labels']                               # Get the labels
-                #tk.record(5)                    # Record at the end of the training
                 if cuda:
                     inputs = inputs.cuda()                              # Put data onto GPU
                     labels = labels.cuda()                              # Put data onto GPU
-                #tk.record(6)                    # Record at the end of the training
                 self.optm.zero_grad()                                   # Zero the gradient first
-                #tk.record(7)                    # Record at the end of the training
                 logit = self.model(inputs.float())                        # Get the output
-                #tk.record(8)                    # Record at the end of the training
                 loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
-                #tk.record(9)                    # Record at the end of the training
                 loss.backward()                                     # Calculate the backward gradients
-                #tk.record(10)                    # Record at the end of the training
                 self.optm.step()                                    # Move one step the optimizer
-                #tk.record(11)                    # Record at the end of the training
                 epoch_samples += inputs.size(0)
                 total_training_samples += inputs.size(0)
 
-                #tk.record(12)                    # Record at the end of the training
-                #tk.record(j)                    # Record at the end of the training
                 # change from epoch base to mini-batch base
                 if j % self.flags.eval_step == 0:
                     IoU = self.compute_iou(logit, labels)
+                    iou_sum_train += IoU
+                    IoU_aggregate = iou_sum_train/total_training_samples
                     self.print_metrics(metrics, epoch_samples, 'training')
-                    print('training IoU in current epoch is', IoU)
+                    print('training IoU in current batch {} is'.format(j), IoU)
+                    print('training IoU uptillnow {} is'.format(j), IoU_aggregate)
                     self.log.add_scalar('training/bce', metrics['bce']/epoch_samples, j)
                     self.log.add_scalar('training/dice', metrics['dice']/epoch_samples, j)
                     self.log.add_scalar('training/loss', metrics['loss']/epoch_samples, j)
-                    self.log.add_scalar('training/IoU', IoU, j)
-                    #tk.record(13)                    # Record at the end of the training
+                    self.log.add_scalar('training/IoU', IoU_aggregate, j)
                     # Set eval mode
                     self.model.eval()
-                    #tk.record(14)                    # Record at the end of the training
                     # Set to Training Mode
                     test_epoch_samples = 0
                     test_metrics = defaultdict(float)
+                    iou_sum = 0
                     for jj, sample in enumerate(self.test_loader):
                         inputs = sample['image']                                # Get the input
                         labels = sample['labels']                               # Get the labels
@@ -240,9 +235,11 @@ class Network(object):
                         logit = self.model(inputs.float())                        # Get the output
                         loss = self.make_loss(logit, labels, test_metrics)               # Get the loss tensor
                         test_epoch_samples += inputs.size(0)
+                        IoU = self.compute_iou(logit, labels)
+                        iou_sum += IoU
                         if test_epoch_samples > self.flags.max_test_sample:
-                            break;
-                    IoU = self.compute_iou(logit, labels)
+                            break
+                    IoU = iou_sum / test_epoch_samples
                     self.print_metrics(metrics, test_epoch_samples, 'testing')
                     print('IoU in current test batch is', IoU)
                     self.log.add_scalar('test/bce', test_metrics['bce']/test_epoch_samples, j)
@@ -289,6 +286,13 @@ class Network(object):
         plt.imshow(image_numpy[0, 0, :, :])
         plt.title('original image')
 
+        ##########################################
+        # Plot the binary mask im as a reference #
+        ##########################################
+        h = plt.figure()
+        plt.imshow(gt_segment[0, 0, :, :])
+        plt.title('binary mask image')
+
         ############################
         # Plot the confusion image #
         ############################
@@ -297,9 +301,9 @@ class Network(object):
         # Create the confusion map
         confusion_map = np.zeros([512, 512, 3])
         # Stage-2: add ground truth to the first channel
-        confusion_map[:, :, 0] = gt_segment[0, 1, :, :]
+        confusion_map[:, :, 0] = gt_segment[0, 0, :, :]
         # Stage-3: add prediction map to the second channel and add legend
-        prediction = segment_output[0, 1, :, :] > segment_output[0, 0, :, :]
+        prediction = segment_output[0, 0, :, :] > 0.5
         confusion_map[:, :, 1] = prediction
         plt.imshow(confusion_map)
         # Add the legend for different colors
@@ -313,6 +317,7 @@ class Network(object):
         # Stage-4: Add that to tensorboard
         self.log.add_figure('Confusion Sample', g, global_step=batch_label)
         self.log.add_figure('Original Image', f, global_step=batch_label)
+        self.log.add_figure('Gt label', h, global_step=batch_label)
         """
         # The debugging phase
         np.save('image.npy', image_numpy)

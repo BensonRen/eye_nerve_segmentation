@@ -1,3 +1,7 @@
+dataIn
+*.txt
+.idea
+network
 **__*
 *.swp
 *.txt
