@@ -54,6 +54,7 @@ python utils/pre_processing.py
 - [x] Evaluation plot function
 - [x] Evaluation module which loads from the trained model
 - [x] Debug the evaluation function
+- [x] Debug the IoU bigger than 1 issue
 - [ ] Add post processing to the output result
 
 ## Time profiling

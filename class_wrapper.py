@@ -241,7 +241,7 @@ class Network(object):
                         iou_sum += IoU
                         if test_epoch_samples > self.flags.max_test_sample:
                             break
-                    IoU = iou_sum / jj
+                    IoU = iou_sum / (jj+1)
                     self.print_metrics(metrics, test_epoch_samples, 'testing')
                     print('IoU in current test batch is', IoU)
                     self.log.add_scalar('test/bce', test_metrics['bce']/test_epoch_samples, j)
@@ -324,7 +324,7 @@ class Network(object):
         np.save('gt_segment.npy', gt_segment)
         """
 
-    def evaluate(self, eval_number_max=10, save_img=False):
+    def evaluate(self, eval_number_max=30, save_img=False):
         """
         Evaluate the trained model, output the IoU of the test case
         :param eval_number_max: The maximum number of images to evaluate
@@ -358,7 +358,7 @@ class Network(object):
             total_eval_num += inputs.size(0)
             if total_eval_num > eval_number_max:    # Reached the limit of inference
                 break
-        average_iou = iou_sum/j
+        average_iou = iou_sum/(j+1)
         print("The average IoU of your evaluation is: ", average_iou)
         return average_iou
 
@@ -400,7 +400,7 @@ class Network(object):
             # Stage-2: add ground truth to the first channel
             confusion_map[:, :, 0] = labels[i, 0, :, :]
             # Stage-3: add prediction map to the second channel and add legend
-            prediction = labels[i, 0, :, :] > 0
+            prediction = logit[i, 0, :, :] > 0
             confusion_map[:, :, 1] = prediction
             plt.imshow(confusion_map)
             # Add the legend for different colors
