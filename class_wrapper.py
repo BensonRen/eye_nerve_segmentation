@@ -20,6 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import jaccard_score as jsc
+from sklearn.metrics import roc_curve,auc
 import cv2
 
 # Own module
@@ -331,12 +332,13 @@ class Network(object):
         np.save('gt_segment.npy', gt_segment)
         """
 
-    def evaluate(self, eval_number_max=10, save_img=False, post_processing=False):
+    def evaluate(self, eval_number_max=10, save_img=False, post_processing=False, ROC=False):
         """
         Evaluate the trained model, output the IoU of the test case
         :param eval_number_max: The maximum number of images to evaluate
         :param save_img: Flag to save the image and binary mask
         :param post_processing: Do the post-processing as illustrated in the function post-processing
+        :param ROC: Plot the ROC function and give the AUROC in the plot
         :return: IoU of the prediction in test case
         """
         self.load()
@@ -349,6 +351,8 @@ class Network(object):
         # Eval loop
         iou_sum = 0
         total_eval_num = 0
+        label_list = []
+        pred_list = []
         for j, sample in enumerate(self.test_loader):
             inputs = sample['image']  # Get the input
             labels = sample['labels']  # Get the labels
@@ -356,6 +360,9 @@ class Network(object):
                 inputs = inputs.cuda()  # Put data onto GPU
                 labels = labels.cuda()  # Put data onto GPU
             logit = self.model(inputs.float())  # Get the output
+            if ROC:         # If calculating ROC, put those into the list
+                label_list.append(labels.cpu().numpy())
+                pred_list.append(logit.detach().cpu().numpy())
             if save_img:                        # If choose to save the evaluation images
                 self.save_eval_image(inputs.cpu().numpy(),
                                      labels.cpu().numpy(),
@@ -370,7 +377,32 @@ class Network(object):
                 break
         average_iou = iou_sum/(j+1)
         print("The average IoU of your evaluation is: ", average_iou)
+        if ROC:
+            print("The AUROC of the prediction is :", self.plot_ROC(label_list, pred_list))
         return average_iou
+
+    def plot_ROC(self, label_list, pred_list):
+        """
+        Plot the ROC curve from the given label and prediction list
+        :param label_list: The list of labels in format of numpy arrays of shape [batch_size, 0, w, l]
+        :param pred_list: The list of predictions in format of numpy arrays of shape [batch_size, 0, w, l]
+        :return: AUROC : Area under the ROC curve
+        """
+        label = np.reshape(np.array(label_list), [-1, 1])
+        pred = np.reshape(np.array(pred_list), [-1, 1])
+        fpr, tpr, threshold = roc_curve(label, pred, pos_label=1)
+        auroc = auc(fpr, tpr)
+        f = plt.figure()#figsize=[15,15])
+        plt.plot(fpr, tpr, lw=3, c='b',label='ROC curve')
+        plt.plot([0, 1], [0, 1], linestyle='--', lw=2, color='r',
+                label='Chance', alpha=.8)
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('ROC curve with AUROC = {}'.format(auroc))
+        #plt.xlim()
+        plt.legend()
+        plt.savefig(os.path.join('data', 'ROC.jpg'))
+        return auroc
 
     def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/'):
         """
