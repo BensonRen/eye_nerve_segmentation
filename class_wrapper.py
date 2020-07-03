@@ -20,6 +20,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import jaccard_score as jsc
+import cv2
 
 # Own module
 from utils.time_recorder import time_keeper
@@ -108,9 +109,15 @@ class Network(object):
         """
         Compute the IOU
         """
-        #print("shape of the original prediction", np.shape(pred.cpu().data.numpy()))
-        lbl = pred.cpu().data.numpy().reshape(-1) > 0
-        tgt = target.cpu().data.numpy().reshape(-1)
+        if isinstance(pred, torch.Tensor):
+            lbl = pred.cpu().data.numpy().reshape(-1) > 0
+        else:   # this is a numpy array
+            lbl = pred.reshape(-1) > 0
+
+        if isinstance(target, torch.Tensor):
+            tgt = target.cpu().data.numpy().reshape(-1)
+        else:   # This is a numpy array
+            tgt = target.reshape(-1)
         #print("shape of lbl in compute iou", np.shape(lbl))
         #print("shape of tgt in compute iou", np.shape(tgt))
         return jsc(tgt, lbl)
@@ -324,11 +331,12 @@ class Network(object):
         np.save('gt_segment.npy', gt_segment)
         """
 
-    def evaluate(self, eval_number_max=30, save_img=False):
+    def evaluate(self, eval_number_max=10, save_img=False, post_processing=False):
         """
         Evaluate the trained model, output the IoU of the test case
         :param eval_number_max: The maximum number of images to evaluate
         :param save_img: Flag to save the image and binary mask
+        :param post_processing: Do the post-processing as illustrated in the function post-processing
         :return: IoU of the prediction in test case
         """
         self.load()
@@ -348,13 +356,15 @@ class Network(object):
                 inputs = inputs.cuda()  # Put data onto GPU
                 labels = labels.cuda()  # Put data onto GPU
             logit = self.model(inputs.float())  # Get the output
-            batch_IoU = self.compute_iou(logit, labels) # Get the batch IoU
-            iou_sum += batch_IoU                # Aggregate the batch IoU
             if save_img:                        # If choose to save the evaluation images
                 self.save_eval_image(inputs.cpu().numpy(),
                                      labels.cpu().numpy(),
                                      logit.detach().cpu().numpy(),
                                      batch_num=j)
+            if post_processing:
+                logit = self.post_processing(logit.detach().cpu().numpy())
+            batch_IoU = self.compute_iou(logit, labels)  # Get the batch IoU
+            iou_sum += batch_IoU  # Aggregate the batch IoU
             total_eval_num += inputs.size(0)
             if total_eval_num > eval_number_max:    # Reached the limit of inference
                 break
@@ -415,4 +425,27 @@ class Network(object):
             # Save the image #
             ##################
             f.savefig(os.path.join(save_dir, 'eval_graph_{}_{}.jpg'.format(batch_num, i)))
+
+            # Debuggin purpose to save the array
+            #np.save('image.npy', inputs[0,0,:,:])
+            #np.save('segment_out.npy', logit[0,0,:,:])
+            #np.save('gt_segment.npy', labels[0,0,:,:])
         return None
+
+    def post_processing(self, logit, erosion_dialation_kernel_size=3, erosion_dialation_iteration=3):
+        """
+        The post-processing of the predicted segmentation map, current process techniques:
+        1. CV2.erode + CV2.dialate (Remove small noise)
+        :param logit: The predicted segmentation map which is in NUMPY format
+        :param erosion_dialation_iteration: Number of iterations for erosion and dialation
+        :param erosion_dialation_kernel_size: The kernel size for erosion and dialation
+        :return: The post_processed map
+        """
+        kernel = np.ones((erosion_dialation_kernel_size, erosion_dialation_kernel_size), np.uint8)
+        for i in range(len(logit)):
+            img_erosion = cv2.erode(logit[i,0,:,:], kernel, iterations=erosion_dialation_iteration)
+            logit[i,0,:,:] = cv2.dilate(img_erosion, kernel, iterations=erosion_dialation_iteration)
+        return logit
+
+
+

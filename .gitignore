@@ -10,4 +10,4 @@ models/*
 **.err
 **.npy
 data
-
+**.npy

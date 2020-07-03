@@ -37,7 +37,7 @@ def evaluate_from_flag(model_dir):
 
     # Training process
     print("Start training now...")
-    ntwk.evaluate(save_img=True)
+    ntwk.evaluate(save_img=False, post_processing=False)
 
 
 if __name__ == '__main__':
