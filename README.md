@@ -55,7 +55,11 @@ python utils/pre_processing.py
 - [x] Evaluation module which loads from the trained model
 - [x] Debug the evaluation function
 - [x] Debug the IoU bigger than 1 issue
-- [ ] Add post processing to the output result
+- [x] Add post processing to the output result
+- [x] Debug the post processing technique 
+- [x] Add PR evaluation to the project
+- [x] Add the AUROC calculation to the ROC plot
+- [x] Run the ROC calculation on the GPU version (100 samples) and make sure nothing goes wrong
 
 ## Time profiling
 **Update on 2020.07.02: The time performance issue is resolved by re-installing gpu version of pytorch** 

@@ -15,10 +15,10 @@ PRETRAIN = True
 #LABEL_FILE = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'
 
 # Small set on Tesla
-TRAIN_ROOT_DIR = os.path.join('dataIn', 'train')
-TRAIN_LABEL_FILE = os.path.join('dataIn', 'train', 'label_file.csv')
-TEST_ROOT_DIR = os.path.join('dataIn',  'train')
-TEST_LABEL_FILE = os.path.join('dataIn', 'train','label_file.csv')
+#TRAIN_ROOT_DIR = os.path.join('dataIn', 'train')
+#TRAIN_LABEL_FILE = os.path.join('dataIn', 'train', 'label_file.csv')
+#TEST_ROOT_DIR = os.path.join('dataIn',  'train')
+#TEST_LABEL_FILE = os.path.join('dataIn', 'train','label_file.csv')
 
 # Full set on Tesla
 # TRAIN_ROOT_DIR = os.path.join('dataIn', 'small_set10', 'train')
@@ -33,10 +33,10 @@ TEST_LABEL_FILE = os.path.join('dataIn', 'train','label_file.csv')
 #TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/small_set10/test/label_file.csv'
 
 # Big set
-#TRAIN_ROOT_DIR = '/work/sr365/OCT_bscans_raw/train'
-#TRAIN_LABEL_FILE = '/work/sr365/OCT_bscans_raw/train/label_file.csv'
-#TEST_ROOT_DIR = '/work/sr365/OCT_bscans_raw/test'
-#TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/test/label_file.csv'
+TRAIN_ROOT_DIR = '/work/sr365/OCT_bscans_raw/train'
+TRAIN_LABEL_FILE = '/work/sr365/OCT_bscans_raw/train/label_file.csv'
+TEST_ROOT_DIR = '/work/sr365/OCT_bscans_raw/test'
+TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/test/label_file.csv'
 
 
 # Training related parameters
@@ -52,7 +52,8 @@ REG_SCALE = 5e-4
 EVAL_STEP = 100
 MODEL_NAME = None
 
-EVAL_MODEL = '20200702_152414'
+#EVAL_MODEL = 'With_dice_loss'
+EVAL_MODEL = 'BCE_Loss_ONLY'
 
 # Test ratio (Currently this flag value is useless because the patien id issue)
 TEST_RATIO = 0.2
