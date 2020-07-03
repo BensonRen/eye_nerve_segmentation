@@ -161,10 +161,12 @@ class Network(object):
         :return:
         """
         # self.model.load_state_dict(torch.load(os.path.join(self.ckpt_dir, 'best_model_state_dict.pt')))
+        path = os.path.join(self.ckpt_dir, 'best_model_forward.pt')
+        #path = self.ckpt_dir + 'best_model_forward.pt'
         if torch.cuda.is_available():
-            self.model = torch.load(os.path.join(self.ckpt_dir, 'best_model_forward.pt'))
+            self.model = torch.load(path)
         else:
-            self.model = torch.load(os.path.join(self.ckpt_dir, 'best_model_forward.pt'), map_location=torch.device('cpu'))
+            self.model = torch.load(path, map_location=torch.device('cpu'))
 
     def train(self):
         """
@@ -259,7 +261,7 @@ class Network(object):
                 if total_training_samples > self.flags.max_train_sample:
                     print("Maximum training samples requirement meet, I have been training for more than ", total_training_samples, " samples.")
                     train_end_flag = True
-                    break;
+                    break
 
         self.log.close()
         tk.record(999)                    # Record at the end of the training
@@ -275,9 +277,6 @@ class Network(object):
         :param gt_segment:  The grount truth segmentation result [numpy array]
         :return: None, the graph plotted would be added to the tensorboard instead of returned
         """
-        #print("shape of image numpy is", np.shape(image_numpy))
-        #print("shape of segment output is", np.shape(segment_output))
-        #print("shape of gt_segment is", np.shape(gt_segment))
 
         ##########################################
         # Plot the original image as a reference #
@@ -303,7 +302,7 @@ class Network(object):
         # Stage-2: add ground truth to the first channel
         confusion_map[:, :, 0] = gt_segment[0, 0, :, :]
         # Stage-3: add prediction map to the second channel and add legend
-        prediction = segment_output[0, 0, :, :] > 0.5
+        prediction = segment_output[0, 0, :, :] > 0
         confusion_map[:, :, 1] = prediction
         plt.imshow(confusion_map)
         # Add the legend for different colors
@@ -325,4 +324,95 @@ class Network(object):
         np.save('gt_segment.npy', gt_segment)
         """
 
+    def evaluate(self, eval_number_max=10, save_img=False):
+        """
+        Evaluate the trained model, output the IoU of the test case
+        :param eval_number_max: The maximum number of images to evaluate
+        :param save_img: Flag to save the image and binary mask
+        :return: IoU of the prediction in test case
+        """
+        self.load()
+        cuda = True if torch.cuda.is_available() else False
+        if cuda:
+            self.model.cuda()
+        # Use evaluation mode for evaluate
+        self.model.eval()
 
+        # Eval loop
+        iou_sum = 0
+        total_eval_num = 0
+        for j, sample in enumerate(self.test_loader):
+            inputs = sample['image']  # Get the input
+            labels = sample['labels']  # Get the labels
+            if cuda:
+                inputs = inputs.cuda()  # Put data onto GPU
+                labels = labels.cuda()  # Put data onto GPU
+            logit = self.model(inputs.float())  # Get the output
+            batch_IoU = self.compute_iou(logit, labels) # Get the batch IoU
+            iou_sum += batch_IoU                # Aggregate the batch IoU
+            if save_img:                        # If choose to save the evaluation images
+                self.save_eval_image(inputs.cpu().numpy(),
+                                     labels.cpu().numpy(),
+                                     logit.detach().cpu().numpy(),
+                                     batch_num=j)
+            total_eval_num += inputs.size(0)
+            if total_eval_num > eval_number_max:    # Reached the limit of inference
+                break
+        average_iou = iou_sum/j
+        print("The average IoU of your evaluation is: ", average_iou)
+        return average_iou
+
+    def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/'):
+        """
+        Plot and save the evaluation image for the evaluation
+        :param inputs: The input raw images
+        :param labels: The gt labels read from
+        :param logit: The output predictions from the model
+        :param batch_num: The batch number to record
+        :param save_dir: The direction to save
+        :return: None
+        """
+        for i in range(np.shape(inputs)[0]):
+            f = plt.figure(figsize=[15,15])
+            ##########################################
+            # Plot the original image as a reference #
+            ##########################################
+            ax = plt.subplot(221)
+            plt.imshow(inputs[i, 0, :, :])
+            plt.title('original')
+            #####################################
+            # Plot the ground truth binary mask #
+            #####################################
+            ax = plt.subplot(222)
+            plt.imshow(labels[i, 0, :, :])
+            plt.title('gt')
+            ###################################
+            # Plot the generated segmentation #
+            ###################################
+            ax = plt.subplot(223)
+            plt.imshow(logit[i, 0, :, :] > 0)
+            plt.title('prediction')
+            #####################################
+            # Plot the confusion matrix / image #
+            #####################################
+            ax = plt.subplot(224)
+            confusion_map = np.zeros([512, 512, 3])
+            # Stage-2: add ground truth to the first channel
+            confusion_map[:, :, 0] = labels[i, 0, :, :]
+            # Stage-3: add prediction map to the second channel and add legend
+            prediction = labels[i, 0, :, :] > 0
+            confusion_map[:, :, 1] = prediction
+            plt.imshow(confusion_map)
+            # Add the legend for different colors
+            plt.plot(0, 0, "s", c='y', label='True positive')
+            plt.plot(0, 0, "s", c='g', label='False positive')
+            plt.plot(0, 0, "s", c='k', label='True negative')
+            plt.plot(0, 0, "s", c='r', label='False negative')
+            plt.title('confusion map')
+            plt.legend()
+
+            ##################
+            # Save the image #
+            ##################
+            f.savefig(os.path.join(save_dir, 'eval_graph_{}_{}.jpg'.format(batch_num, i)))
+        return None

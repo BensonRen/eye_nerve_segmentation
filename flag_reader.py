@@ -22,7 +22,7 @@ def read_flag():
 
     # Optimizer Params
     parser.add_argument('--model-name', default=MODEL_NAME, type=str, help='model name to save')
-
+    parser.add_argument('--eval-model', default=EVAL_MODEL, type=str, help='The model to evaluate (load)')
 
     # Optimizer Params
     parser.add_argument('--optim', default=OPTIM, type=str, help='the type of optimizer that you want to use')

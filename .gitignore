@@ -9,4 +9,5 @@ models/*
 **.sh
 **.err
 **.npy
+data
 
