@@ -10,6 +10,8 @@ IMG_W = 512
 NUM_WORKERS = 2
 CUT_SQUARE = False
 PRETRAIN = False
+NETWORK_BACKBONE = 'resnet_18'
+
 # Mac set
 #ROOT_DIR = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10'
 #LABEL_FILE = '/Users/ben/Downloads/Eye segmentation project/OCT_bscans_raw/small_set10/label_file.csv'

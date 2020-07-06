@@ -19,8 +19,13 @@ class ResNetUNet(nn.Module):
         super().__init__()
         # setting up the time keeper to do the prifling of the time
         #self.tk = time_keeper('forward_model_time.txt')
-
-        self.base_model = models.resnet18(pretrained=flags.pretrain)
+        if flags.network_backbone == 'resnet_18':
+            self.base_model = models.resnet18(pretrained=flags.pretrain)
+        elif flags.network_backbone == 'resnet_50':
+            self.base_model = models.resnet50(pretrained=flags.pretrain)
+        else:
+            raise ValueError("Your flags.network_backbone is neither resnet18 nor resnet50! \
+            Which are the only supported models currently")
         self.base_layers = list(self.base_model.children())
 
         self.layer0 = nn.Sequential(*self.base_layers[:3]) # size=(N, 64, x.H/2, x.W/2)

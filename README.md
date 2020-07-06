@@ -58,10 +58,12 @@ python utils/pre_processing.py
 - [x] Add post processing to the output result
 - [x] Add the name tags to the data reader so that while needed it has access to print
 - [x] Revise plotting module for saving label name
-- [ ] Ablation study on Post-processing
-- [ ] Ablation study on Dice Loss
-- [ ] Ablation study on pretrained-18, pretrained-50, standard_Unet_from_scratch
-- [ ] Ablation study on Batch_size
+- [x] Ablation study on Post-processing code set up
+- [x] Ablation study on Dice Loss code set up
+- [x] Ablation study on pretrained-18, pretrained-50, standard_Unet_from_scratch code set up
+- [x] Ablation study on Batch_size code set up
+- [ ] Debug the Ablation study code 
+- [ ] Run on DCC the above-mentioned ablation studies
 - [ ] Run model on "low quality images" to test out the comparison
 
 ## Time profiling

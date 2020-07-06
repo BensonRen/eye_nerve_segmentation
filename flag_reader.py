@@ -19,6 +19,7 @@ def read_flag():
     parser = argparse.ArgumentParser()
     # Data_Set parameter
     parser.add_argument('--test-ratio', default=TEST_RATIO, type=float, help='the ratio of the test set')
+    parser.add_argument('--network-backbone', default=NETWORK_BACKBONE, type=str, help='the backbone of the Unet encoder')
 
     # Optimizer Params
     parser.add_argument('--model-name', default=MODEL_NAME, type=str, help='model name to save')
