@@ -32,12 +32,11 @@ class EyeDataset(Dataset):
     def __getitem__(self, idx):
         if torch.is_tensor(idx):
             idx = idx.tolist()
-
+        name = self.labels.iloc[idx, 0]
         #print('Idx: ', idx)
-        img_name = os.path.join(self.root_dir,
-                                self.labels.iloc[idx, 0])
+        img_name = os.path.join(self.root_dir, name)
 
-        label_name = os.path.join(self.root_dir, 'mask', self.labels.iloc[idx, 0])
+        label_name = os.path.join(self.root_dir, 'mask', name)
         labels = np.expand_dims(io.imread(label_name)>200, axis=0)              # 200 is the threshold for rounding
         #labels_inv = 1 - labels
         #labels_inv = np.logical_not(labels)
@@ -48,9 +47,9 @@ class EyeDataset(Dataset):
         # cut to square for simplicity now
         # print(np.shape(image))
         if self.cut_square:
-            image = image[ :self.img_w, :self.img_w]
+            image = image[:self.img_w, :self.img_w]
             labels = labels[:, :self.img_w, :self.img_w]
-        sample = {'image': image, 'labels': labels}
+        sample = {'image': image, 'labels': labels, 'name': name}
 
         if self.transform:
             sample = self.transform(sample)
@@ -61,7 +60,7 @@ class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
     def __call__(self, sample):
-        image, labels = sample['image'], sample['labels']
+        image, labels, names = sample['image'], sample['labels'], sample['name']
         # Make the image into 3 dimension
         image = np.expand_dims(image, axis=0)
         image = np.concatenate([image, image, image], axis=0).astype('float')
@@ -70,7 +69,8 @@ class ToTensor(object):
         #labels = np.concatenate([labels, labels, labels], axis=0).astype('float')
         #image = image.transpose((2, 0, 1))
         return {'image': torch.from_numpy(image),
-                'labels': torch.from_numpy(labels)}
+                'labels': torch.from_numpy(labels),
+                'name': names}
 
 def read_data(flags):
     trainSet = EyeDataset(flags, transform=ToTensor(),train=True)

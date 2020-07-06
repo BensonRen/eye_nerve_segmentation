@@ -17,14 +17,14 @@ PRETRAIN = True
 # Small set on Tesla
 TRAIN_ROOT_DIR = os.path.join('dataIn', 'train')
 TRAIN_LABEL_FILE = os.path.join('dataIn', 'train', 'label_file.csv')
-TEST_ROOT_DIR = os.path.join('dataIn',  'train')
-TEST_LABEL_FILE = os.path.join('dataIn', 'train','label_file.csv')
+TEST_ROOT_DIR = "D:\AML\Eyeseg_data\small_set10\test" #os.path.join('dataIn',  'test_small')
+TEST_LABEL_FILE = "D:\AML\Eyeseg_data\small_set10\test\label_file.csv" #os.path.join('dataIn', 'test_small','label_file.csv')
 
 # Full set on Tesla
 # TRAIN_ROOT_DIR = os.path.join('dataIn', 'small_set10', 'train')
 # TRAIN_LABEL_FILE = os.path.join('dataIn', 'small_set10', 'train', 'label_file.csv')
-# TEST_ROOT_DIR = os.path.join('dataIn', 'small_set10', 'train')
-# TEST_LABEL_FILE = os.path.join('dataIn', 'small_set10', 'train','label_file.csv')
+# TEST_ROOT_DIR = os.path.join('dataIn', 'small_set10', 'test')
+# TEST_LABEL_FILE = os.path.join('dataIn', 'small_set10', 'test','label_file.csv')
 
 # Small set
 #TRAIN_ROOT_DIR = '/work/sr365/OCT_bscans_raw/small_set10/train'

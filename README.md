@@ -55,7 +55,14 @@ python utils/pre_processing.py
 - [x] Evaluation module which loads from the trained model
 - [x] Debug the evaluation function
 - [x] Debug the IoU bigger than 1 issue
-- [ ] Add post processing to the output result
+- [x] Add post processing to the output result
+- [x] Add the name tags to the data reader so that while needed it has access to print
+- [x] Revise plotting module for saving label name
+- [ ] Ablation study on Post-processing
+- [ ] Ablation study on Dice Loss
+- [ ] Ablation study on pretrained-18, pretrained-50, standard_Unet_from_scratch
+- [ ] Ablation study on Batch_size
+- [ ] Run model on "low quality images" to test out the comparison
 
 ## Time profiling
 **Update on 2020.07.02: The time performance issue is resolved by re-installing gpu version of pytorch** 

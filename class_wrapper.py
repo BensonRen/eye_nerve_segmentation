@@ -332,13 +332,14 @@ class Network(object):
         np.save('gt_segment.npy', gt_segment)
         """
 
-    def evaluate(self, eval_number_max=10, save_img=False, post_processing=False, ROC=False):
+    def evaluate(self, eval_number_max=10, save_img=False, post_processing=False, ROC=False, save_label=None):
         """
         Evaluate the trained model, output the IoU of the test case
         :param eval_number_max: The maximum number of images to evaluate
         :param save_img: Flag to save the image and binary mask
         :param post_processing: Do the post-processing as illustrated in the function post-processing
         :param ROC: Plot the ROC function and give the AUROC in the plot
+        :param save_label: If save_img, save the label as the name of the image or not
         :return: IoU of the prediction in test case
         """
         self.load()
@@ -354,23 +355,26 @@ class Network(object):
         label_list = []
         pred_list = []
         for j, sample in enumerate(self.test_loader):
-            inputs = sample['image']  # Get the input
-            labels = sample['labels']  # Get the labels
+            inputs = sample['image']    # Get the input
+            labels = sample['labels']   # Get the labels
+            name = sample['name']       # Get the name
             if cuda:
                 inputs = inputs.cuda()  # Put data onto GPU
                 labels = labels.cuda()  # Put data onto GPU
             logit = self.model(inputs.float())  # Get the output
-            if ROC:         # If calculating ROC, put those into the list
-                label_list.append(labels.cpu().numpy())
-                pred_list.append(logit.detach().cpu().numpy())
-            if save_img:                        # If choose to save the evaluation images
-                self.save_eval_image(inputs.cpu().numpy(),
-                                     labels.cpu().numpy(),
-                                     logit.detach().cpu().numpy(),
-                                     batch_num=j)
+            # Get those numpy version for later use
+            input_numpy = inputs.cpu().numpy()
+            labels_numpy = labels.cpu().numpy()
+            logit_numpy = logit.detach().cpu().numpy()
             if post_processing:
-                logit = self.post_processing(logit.detach().cpu().numpy())
-            batch_IoU = self.compute_iou(logit, labels)  # Get the batch IoU
+                logit_numpy = self.post_processing(logit_numpy)
+            if ROC:         # If calculating ROC, put those into the list
+                label_list.append(labels_numpy)
+                pred_list.append(logit_numpy)
+            if save_img:                        # If choose to save the evaluation images
+                self.save_eval_image(input_numpy, labels_numpy, logit_numpy,
+                                     batch_num=j, save_label=name)
+            batch_IoU = self.compute_iou(logit_numpy, labels_numpy)  # Get the batch IoU
             iou_sum += batch_IoU  # Aggregate the batch IoU
             total_eval_num += inputs.size(0)
             if total_eval_num > eval_number_max:    # Reached the limit of inference
@@ -404,7 +408,7 @@ class Network(object):
         plt.savefig(os.path.join('data', 'ROC.jpg'))
         return auroc
 
-    def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/'):
+    def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/', save_label=None):
         """
         Plot and save the evaluation image for the evaluation
         :param inputs: The input raw images
@@ -412,6 +416,7 @@ class Network(object):
         :param logit: The output predictions from the model
         :param batch_num: The batch number to record
         :param save_dir: The direction to save
+        :param save_label: If save_img, save the label as the name of the image or not
         :return: None
         """
         for i in range(np.shape(inputs)[0]):
@@ -456,8 +461,10 @@ class Network(object):
             ##################
             # Save the image #
             ##################
-            f.savefig(os.path.join(save_dir, 'eval_graph_{}_{}.jpg'.format(batch_num, i)))
-
+            if save_label is None:
+                f.savefig(os.path.join(save_dir, 'eval_graph_{}_{}.jpg'.format(batch_num, i)))
+            else:
+                f.savefig(os.path.join(save_dir, save_label[i].replace('.jpg', '') + '_segmentation_result.jpg'))
             # Debuggin purpose to save the array
             #np.save('image.npy', inputs[0,0,:,:])
             #np.save('segment_out.npy', logit[0,0,:,:])
