@@ -62,7 +62,11 @@ python utils/pre_processing.py
 - [x] Ablation study on Dice Loss code set up
 - [x] Ablation study on pretrained-18, pretrained-50, standard_Unet_from_scratch code set up
 - [x] Ablation study on Batch_size code set up
-- [ ] Debug the Ablation study code 
+- [x] Debug the Ablation study code 
+- [x] THE LABEL ISSUE: SHOULD USE RNFL AS LABEL INSTEAD OF EPR, DOING LABELING AGAIN
+- [x] Add the evaluation bulk module to do multi-model evaluation
+- [x] Add the evaluation summary writing to the evaluation function
+- [ ] Debug the evaluation new code
 - [ ] Run on DCC the above-mentioned ablation studies
 - [ ] Run model on "low quality images" to test out the comparison
 

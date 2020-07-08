@@ -53,7 +53,7 @@ OPTIM = 'Adam'
 REG_SCALE = 5e-4
 EVAL_STEP = 100
 MODEL_NAME = None
-
+BCE_WEIGHT = 0.5
 EVAL_MODEL = '20200702_152414'
 
 # Test ratio (Currently this flag value is useless because the patien id issue)

@@ -11,8 +11,8 @@ import os
 
 # Define some names and constants
 file_name = '/work/sr365/OCT_bscans_raw/label_file.csv'
-img_dir = '/work/sr365/OCT_bscans_raw/raw_bscans/mask'
-target_test_folder = '/work/sr365/OCT_bscans_raw/test/mask'
+img_dir = '/work/sr365/OCT_bscans_raw/raw_bscans/train/mask'
+target_test_folder = '/work/sr365/OCT_bscans_raw/raw_bscans/test/mask'
 target_train_folder = '/work/sr365/OCT_bscans_raw/train/mask'
 Move_to_test = True # move to test if true, delete if false
 test_index = 5480

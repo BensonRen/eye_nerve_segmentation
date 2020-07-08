@@ -21,6 +21,8 @@ class ResNetUNet(nn.Module):
         #self.tk = time_keeper('forward_model_time.txt')
         if flags.network_backbone == 'resnet_18':
             self.base_model = models.resnet18(pretrained=flags.pretrain)
+        elif flags.network_backbone == 'resnet_34':
+            self.base_model = models.resnet34(pretrained=flags.pretrain)
         elif flags.network_backbone == 'resnet_50':
             self.base_model = models.resnet50(pretrained=flags.pretrain)
         else:

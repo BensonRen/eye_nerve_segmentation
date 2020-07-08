@@ -14,8 +14,8 @@ from skimage.util import pad
 mask_mode = True
 
 # sr365 small set
-image_dir = '/work/sr365/OCT_bscans_raw/raw_bscans/mask'
-output_dir = '/work/sr365/OCT_bscans_raw/train/mask'
+image_dir = '/work/sr365/OCT_bscans_raw/raw_bscans/test/mask'
+output_dir = '/work/sr365/OCT_bscans_raw/raw_bscans/test/split_mask'
 label_file_name = '/work/sr365/OCT_bscans_raw/train/label_file.csv'
 # sr365 small set
 #image_dir = '/work/sr365/OCT_bscans_raw/small_set10/train'

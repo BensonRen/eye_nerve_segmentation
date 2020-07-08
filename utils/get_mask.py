@@ -17,7 +17,8 @@ labels = pd.read_csv('/work/sr365/OCT_bscans_raw/20200219-segmentation_lines.csv
 img_l, img_w = 1536, 496
 # Get the ilm and epr from data frame
 ilm = labels[['ilm{}'.format(i+1) for i in range(img_l)]]
-epr = labels[['epr{}'.format(i+1) for i in range(img_l)]]
+#epr = labels[['epr{}'.format(i+1) for i in range(img_l)]]
+rnfl = labels[['rnfl{}'.format(i+1) for i in range(img_l)]]
 
 # helper_axis
 x_axis = np.arange(img_l)
@@ -30,7 +31,8 @@ for ind, figure_name in enumerate(labels['filejpg']):
     print("Reading picture", figure_name)
     bm = np.zeros([img_w, img_l], dtype=np.uint8)
     for i in range(img_l):
-        mask = (y_axis+1 > ilm.iloc[ind, i]) * (y_axis + 1 < epr.iloc[ind, i])
+        mask = (y_axis+1 > ilm.iloc[ind, i]) * (y_axis + 1 < rnfl.iloc[ind, i])
+        #mask = (y_axis+1 > ilm.iloc[ind, i]) * (y_axis + 1 < epr.iloc[ind, i])
         bm[mask, i] = 255
     # Save the mask
     save_name = os.path.join('/work/sr365/OCT_bscans_raw','raw_bscans','mask',figure_name)

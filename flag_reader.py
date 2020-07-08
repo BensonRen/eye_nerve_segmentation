@@ -51,6 +51,7 @@ def read_flag():
     parser.add_argument('--test-root-dir', type=str, default=TEST_ROOT_DIR, help='The Root directory to get the images')
     parser.add_argument('--test-label-file', type=str, default=TEST_LABEL_FILE, help='The label file to get the list of names')
     parser.add_argument('--cut-square', type=bool, default=CUT_SQUARE, help='the flag to cut the image into 496 x 496')
+    parser.add_argument('--bce-weight', default=BCE_WEIGHT, type=float, help='The weight of BCE loss in DICE loss [0,1], 1 means no dice loss')
 
 
 

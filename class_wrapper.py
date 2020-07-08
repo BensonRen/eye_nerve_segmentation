@@ -60,8 +60,8 @@ class Network(object):
         cuda = True if torch.cuda.is_available() else False
         if cuda:
             model.cuda()
-        summary(model, input_size=(3, 512, 512))
         print(model)
+        summary(model, input_size=(3, 512, 512))
         return model
 
     def dice_loss(self, pred, target, smooth=1.):
@@ -97,8 +97,7 @@ class Network(object):
         pred_sigmoid = torch.sigmoid(pred)
         #print("start of pred_sigmoid", pred_sigmoid.detach().cpu().numpy()[0, :, 0, 0])
         dice = self.dice_loss(pred_sigmoid, target)
-        loss = bce
-        #loss = bce * bce_weight + dice * (1 - bce_weight)
+        loss = bce * bce_weight + dice * (1 - bce_weight)
 
         metrics['bce'] += bce.data.cpu().numpy() * target.size(0)
         metrics['dice'] += dice.data.cpu().numpy() * target.size(0)
@@ -169,6 +168,7 @@ class Network(object):
         :return:
         """
         # self.model.load_state_dict(torch.load(os.path.join(self.ckpt_dir, 'best_model_state_dict.pt')))
+        print("In model loading, the self.ckpt_dir is ", self.ckpt_dir)
         path = os.path.join(self.ckpt_dir, 'best_model_forward.pt')
         #path = self.ckpt_dir + 'best_model_forward.pt'
         if torch.cuda.is_available():
@@ -211,7 +211,8 @@ class Network(object):
                     labels = labels.cuda()                              # Put data onto GPU
                 self.optm.zero_grad()                                   # Zero the gradient first
                 logit = self.model(inputs.float())                        # Get the output
-                loss = self.make_loss(logit, labels, metrics)               # Get the loss tensor
+                loss = self.make_loss(logit, labels, metrics, 
+                                      bce_weight=self.flags.bce_weight)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
                 epoch_samples += inputs.size(0)
@@ -243,7 +244,8 @@ class Network(object):
                             labels = labels.cuda()                              # Put data onto GPU
                         self.optm.zero_grad()                                   # Zero the gradient first
                         logit = self.model(inputs.float())                        # Get the output
-                        loss = self.make_loss(logit, labels, test_metrics)               # Get the loss tensor
+                        loss = self.make_loss(logit, labels, test_metrics,
+                                              bce_weight=self.flags.bce_weight)   # Get the loss tensor
                         test_epoch_samples += inputs.size(0)
                         IoU = self.compute_iou(logit, labels)
                         iou_sum += IoU
@@ -349,6 +351,8 @@ class Network(object):
         # Use evaluation mode for evaluate
         self.model.eval()
 
+        auroc = -1 # dummy variable
+
         # Eval loop
         iou_sum = 0
         total_eval_num = 0
@@ -382,8 +386,9 @@ class Network(object):
         average_iou = iou_sum/(j+1)
         print("The average IoU of your evaluation is: ", average_iou)
         if ROC:
-            print("The AUROC of the prediction is :", self.plot_ROC(label_list, pred_list))
-        return average_iou
+            auroc =  self.plot_ROC(label_list, pred_list)
+            print("The AUROC of the prediction is :", auroc)
+        return average_iou, auroc
 
     def plot_ROC(self, label_list, pred_list):
         """
@@ -405,7 +410,7 @@ class Network(object):
         plt.title('ROC curve with AUROC = {}'.format(auroc))
         #plt.xlim()
         plt.legend()
-        plt.savefig(os.path.join('data', 'ROC.jpg'))
+        plt.savefig(os.path.join('data', self.model_name + 'ROC.jpg'))
         return auroc
 
     def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/', save_label=None):
