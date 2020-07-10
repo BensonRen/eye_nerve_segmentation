@@ -1,4 +1,6 @@
 dataIn
+**.jpg
+**.png
 *.txt
 .idea
 network
@@ -10,4 +12,3 @@ models/*
 **.err
 **.npy
 data
-**.npy
