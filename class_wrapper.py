@@ -410,7 +410,7 @@ class Network(object):
         plt.title('ROC curve with AUROC = {}'.format(auroc))
         #plt.xlim()
         plt.legend()
-        plt.savefig(os.path.join('data', self.model_name + 'ROC.jpg'))
+        plt.savefig(os.path.join('data', self.ckpt_dir.replace('models','') + 'ROC.jpg'))
         return auroc
 
     def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/', save_label=None):
@@ -476,20 +476,45 @@ class Network(object):
             #np.save('gt_segment.npy', labels[0,0,:,:])
         return None
 
-    def post_processing(self, logit, erosion_dialation_kernel_size=3, erosion_dialation_iteration=3):
+    def post_processing(self, logit, operation_style='open+close',
+                        erosion_dialation_kernel_size=3, erosion_dialation_iteration=3):
         """
         The post-processing of the predicted segmentation map, current process techniques:
         1. CV2.erode + CV2.dialate (Remove small noise)
         :param logit: The predicted segmentation map which is in NUMPY format
+        :param operation_style: The morphological operation for post-processing, now we only support
+                open, close and open+close / close+open
         :param erosion_dialation_iteration: Number of iterations for erosion and dialation
         :param erosion_dialation_kernel_size: The kernel size for erosion and dialation
         :return: The post_processed map
         """
         kernel = np.ones((erosion_dialation_kernel_size, erosion_dialation_kernel_size), np.uint8)
-        for i in range(len(logit)):
-            img_erosion = cv2.erode(logit[i,0,:,:], kernel, iterations=erosion_dialation_iteration)
-            logit[i,0,:,:] = cv2.dilate(img_erosion, kernel, iterations=erosion_dialation_iteration)
-        return logit
+        # Doing Morphological Close operation
+        if operation_style == 'close':
+            for i in range(len(logit)):
+                img_erosion = cv2.erode(logit[i,0,:,:], kernel, iterations=erosion_dialation_iteration)
+                logit[i,0,:,:] = cv2.dilate(img_erosion, kernel, iterations=erosion_dialation_iteration)
+            return logit
+        # Doing Morphological Open operation
+        elif operation_style == 'open':
+            for i in range(len(logit)):
+                img_dilation  = cv2.dilate(logit[i,0,:,:], kernel, iterations=erosion_dialation_iteration)
+                logit[i,0,:,:] = cv2.erode(img_dilation, kernel, iterations=erosion_dialation_iteration)
+            return logit
+        # Doing Morphological Open + close operation, recursive structure of calling myself
+        elif operation_style == 'open+close':
+            logit = self.post_processing(logit, operation_style='open', erosion_dialation_kernel_size, erosion_dialation_ieration) 
+            logit = self.post_processing(logit, operation_style='close', erosion_dialation_kernel_size, erosion_dialation_ieration) 
+            return logit
+        # Doing Morphological close + open operation, recursive structure of calling myself
+        elif operation_style == 'close+open':
+            logit = self.post_processing(logit, operation_style='close', erosion_dialation_kernel_size, erosion_dialation_ieration) 
+            logit = self.post_processing(logit, operation_style='open', erosion_dialation_kernel_size, erosion_dialation_ieration) 
+            return logit
+        else:
+            raise Exception("Your post-processing operation_style has to be one of: Open, close, open+close, close+open, please contact Ben")
+                
+            
 
 
 

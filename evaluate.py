@@ -19,7 +19,7 @@ from class_wrapper import Network
 from model_maker import ResNetUNet
 from utils.helper_functions import put_param_into_folder, write_flags_and_BVE
 
-def evaluate_from_model(model_dir, write_summary_to_csv_flag=True, num=10000, 
+def evaluate_from_model(model_dir, write_summary_to_csv_flag=True, num=1000, 
                        post_processing=False, ROC=True, save_img=False, save_label=False):
     """
     Training interface. 1. Read data 2. initialize network 3. train network 4. record flags
@@ -85,10 +85,10 @@ def write_summary_to_csv(model_dir, num_infered, iou, auroc, post_processing, su
 
 if __name__ == '__main__':
     # Read the parameters to be set
-    #flags = flag_reader.read_flag()
+    flags = flag_reader.read_flag()
 
     # Call the train from flag function
-    #evaluate_from_flag(flags.eval_model)
+    #evaluate_from_model(flags.eval_model)
 
     evaluate_all()
 

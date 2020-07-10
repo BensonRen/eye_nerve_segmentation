@@ -10,17 +10,17 @@ if __name__ == '__main__':
     #linear_unit_list = [1000, 500]
     #linear_unit_list = [30, 50, 100]
     #reg_scale_list = [5e-4, 1e-3]
-    for batch_size in [2, 3]:
-        for backbone in ['resnet_34','resnet_18']:
-            for bce_weight in [0.5, 1]:
-                for pre_train in [False]:
+    for batch_size in [3]:
+        for backbone in ['resnet_18']:
+            for bce_weight in [0.5]:
+                for pre_train in [True]:
                     flags = flag_reader.read_flag()  	#setting the base case
                     flags.batch_size = batch_size
                     flags.network_backbone = backbone
                     flags.bce_weight = bce_weight
                     flags.pre_train = pre_train
-                    flags.model_name = backbone + '_pre_trained_' + str(pre_train) + '_batch_size_' + str(batch_size) + '_bce_weight_' + str(bce_weight)
-                    train.training_from_flag(flags)
+                    flags.model_name = backbone + '_pre_trained_' + str(pre_train) + '_batch_size_' + str(batch_size) + '_bce_weight_' + str(bce_weight) + '_Epoch_' + str(flags.train_step)
+                   train.training_from_flag(flags)
                         
     #    for layer_num in range(3,5):
     #for kernel_first in conv_kernel_size_first_list:

@@ -66,8 +66,13 @@ python utils/pre_processing.py
 - [x] THE LABEL ISSUE: SHOULD USE RNFL AS LABEL INSTEAD OF EPR, DOING LABELING AGAIN
 - [x] Add the evaluation bulk module to do multi-model evaluation
 - [x] Add the evaluation summary writing to the evaluation function
-- [ ] Debug the evaluation new code
-- [ ] Run on DCC the above-mentioned ablation studies
+- [x] Debug the evaluation new code
+- [x] Run on DCC the above-mentioned ablation studies
+- [x] Add the morphological closing and "hole chlosing" post processing to the code
+- [x] Run the 5 Epoch run on 2 GPUs for total length
+- [ ] Write the weighted edge code
+
+
 - [ ] Run model on "low quality images" to test out the comparison
 
 ## Time profiling
