@@ -54,7 +54,7 @@ REG_SCALE = 5e-4
 EVAL_STEP = 1000
 MODEL_NAME = None
 BCE_WEIGHT = 0.5
-EVAL_MODEL = 'resnet_18_pre_trained_True_batch_size_3_bce_weight_0.5'
+EVAL_MODEL = 'resnet_18_pre_trained_True_batch_size_3_bce_weight_0.5_Epoch_5'
 # Test ratio (Currently this flag value is useless because the patien id issue)
 TEST_RATIO = 0.2
 

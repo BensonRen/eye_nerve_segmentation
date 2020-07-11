@@ -343,7 +343,7 @@ class Network(object):
         np.save('gt_segment.npy', gt_segment)
         """
 
-    def evaluate(self, eval_number_max=10, save_img=False, post_processing=False, ROC=False, save_label=None):
+    def evaluate(self, eval_number_max=10, save_img=False, post_processing=None, ROC=False, save_label=None):
         """
         Evaluate the trained model, output the IoU of the test case
         :param eval_number_max: The maximum number of images to evaluate
@@ -379,8 +379,8 @@ class Network(object):
             input_numpy = inputs.cpu().numpy()
             labels_numpy = labels.cpu().numpy()
             logit_numpy = logit.detach().cpu().numpy()
-            if post_processing:
-                logit_numpy = self.post_processing(logit_numpy)
+            if post_processing is not None:
+                logit_numpy = self.post_processing(logit_numpy, post_processing=post_processing)
             if ROC:         # If calculating ROC, put those into the list
                 label_list.append(labels_numpy)
                 pred_list.append(logit_numpy)
@@ -512,13 +512,13 @@ class Network(object):
             return logit
         # Doing Morphological Open + close operation, recursive structure of calling myself
         elif operation_style == 'open+close':
-            logit = self.post_processing(logit, operation_style='open', erosion_dialation_kernel_size, erosion_dialation_ieration) 
-            logit = self.post_processing(logit, operation_style='close', erosion_dialation_kernel_size, erosion_dialation_ieration) 
+            logit = self.post_processing(logit, operation_style='open', erosion_dialation_kernel_size, erosion_dialation_iteration) 
+            logit = self.post_processing(logit, operation_style='close', erosion_dialation_kernel_size, erosion_dialation_iteration) 
             return logit
         # Doing Morphological close + open operation, recursive structure of calling myself
         elif operation_style == 'close+open':
-            logit = self.post_processing(logit, operation_style='close', erosion_dialation_kernel_size, erosion_dialation_ieration) 
-            logit = self.post_processing(logit, operation_style='open', erosion_dialation_kernel_size, erosion_dialation_ieration) 
+            logit = self.post_processing(logit, operation_style='close', erosion_dialation_kernel_size, erosion_dialation_iteration) 
+            logit = self.post_processing(logit, operation_style='open', erosion_dialation_kernel_size, erosion_dialation_iteration) 
             return logit
         else:
             raise Exception("Your post-processing operation_style has to be one of: Open, close, open+close, close+open, please contact Ben")

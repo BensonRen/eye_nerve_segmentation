@@ -20,7 +20,7 @@ from model_maker import ResNetUNet
 from utils.helper_functions import put_param_into_folder, write_flags_and_BVE
 
 def evaluate_from_model(model_dir, write_summary_to_csv_flag=True, num=1000, 
-                       post_processing=False, ROC=True, save_img=False, save_label=False):
+                       post_processing=None, ROC=True, save_img=False, save_label=False):
     """
     Training interface. 1. Read data 2. initialize network 3. train network 4. record flags
     :param flag: The training flags read from command line or parameter.py
@@ -49,14 +49,14 @@ def evaluate_from_model(model_dir, write_summary_to_csv_flag=True, num=1000,
         write_summary_to_csv(model_dir, num, iou, auroc, post_processing)
 
 
-def evaluate_all(models_dir="models"):
+def evaluate_all(models_dir="models", post_processing=None):
     """
     This function evaluate all the models in the models/. directory
     :return: None
     """
     for file in os.listdir(models_dir):
         if os.path.isfile(os.path.join(models_dir, file, 'flags.obj')):
-            evaluate_from_model(os.path.join(models_dir, file))
+            evaluate_from_model(os.path.join(models_dir, file), post_processing=post_processing)
     return None
 
 
@@ -90,7 +90,10 @@ if __name__ == '__main__':
     # Call the train from flag function
     #evaluate_from_model(flags.eval_model)
 
-    evaluate_all()
+    evaluate_all(post_processing='close')
+    evaluate_all(post_processing='open')
+    evaluate_all(post_processing='close+open')
+    evaluate_all(post_processing='open+close')
 
     # Do the retraining for all the data set to get the training
     #for i in range(10):
