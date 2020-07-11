@@ -70,9 +70,8 @@ python utils/pre_processing.py
 - [x] Run on DCC the above-mentioned ablation studies
 - [x] Add the morphological closing and "hole chlosing" post processing to the code
 - [x] Run the 5 Epoch run on 2 GPUs for total length
-- [ ] Write the weighted edge code
-
-
+- [x] Write the weighted edge code
+- [ ] Debug the weighted edge code using different kernel sizes
 - [ ] Run model on "low quality images" to test out the comparison
 
 ## Time profiling

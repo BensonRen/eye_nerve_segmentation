@@ -79,23 +79,32 @@ class Network(object):
 
         return loss.mean()
 
-    def make_loss(self, pred, target, metrics, bce_weight=0.5):
+    def make_loss(self, pred, target, metrics, bce_weight=0.5, boundary_weight=1, boundary_width=3):
         """
         Create a tensor that represents the loss. This is consistant both at training time \
         and inference time for Backward model
         :param logit: The output of the network
         :param labels: The ground truth labels
+        :param metrics: The metrics to save
+        :param bce_weight: The weight of binary cross entropy loss (1 is without dice loss)
+        :param boundary_width: The size of the morphological kernel (Defalut: 3)
+        :param boundary_weight: The weight on the loss boundary
         :return: the total loss
         """
         import torch.nn.functional as F
-        #print("pred shape", np.shape(pred), "type", type(pred))
-        #print("target shape", np.shape(target), "type", type(target))
-        #print(pred)
-        #print(target)
-        bce = F.binary_cross_entropy_with_logits(pred, target)
-        #print("start of pred", pred.detach().cpu().numpy()[0, :, 0, 0])
+        if boundary_weight != 0:
+            # Add the boundary weight to the training
+            target_numpy = target.cpu().numpy()
+            kernel = np.ones((boundary_width, boundary_width), np.uint8)
+            # Using morphological gradient to do the boundary weighting
+            for i in range(len(target_numpy)):
+                target_numpy[i,0,:,:] = cv2.morphologyEx(target_numpy[i,0,:,:], cv2.MORPH_GRADIENT, kernel)
+            weight = np.ones_like(target_numpy) + boundary_weight * target_numpy
+            bce = F.binary_cross_entropy_with_logits(weight=torch.tensor(weight, requires_grad=False),
+                                                     input=pred, target=target)
+        else:
+            bce = F.binary_cross_entropy_with_logits(pred, target)
         pred_sigmoid = torch.sigmoid(pred)
-        #print("start of pred_sigmoid", pred_sigmoid.detach().cpu().numpy()[0, :, 0, 0])
         dice = self.dice_loss(pred_sigmoid, target)
         loss = bce * bce_weight + dice * (1 - bce_weight)
 
