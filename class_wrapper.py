@@ -93,6 +93,7 @@ class Network(object):
         """
         import torch.nn.functional as F
         if boundary_weight != 0:
+            cuda = True if torch.cuda.is_available() else False
             # Add the boundary weight to the training
             target_numpy = target.cpu().numpy()
             kernel = np.ones((boundary_width, boundary_width), np.uint8)
@@ -100,8 +101,10 @@ class Network(object):
             for i in range(len(target_numpy)):
                 target_numpy[i,0,:,:] = cv2.morphologyEx(target_numpy[i,0,:,:], cv2.MORPH_GRADIENT, kernel)
             weight = np.ones_like(target_numpy) + boundary_weight * target_numpy
-            bce = F.binary_cross_entropy_with_logits(weight=torch.tensor(weight, requires_grad=False),
-                                                     input=pred, target=target)
+            weight_torch = torch.tensor(weight, requires_grad=False)
+            if cuda:
+                weight_torch = weight_torch.cuda()
+            bce = F.binary_cross_entropy_with_logits(weight=weight_torch, input=pred, target=target)
         else:
             bce = F.binary_cross_entropy_with_logits(pred, target)
         pred_sigmoid = torch.sigmoid(pred)
@@ -221,7 +224,8 @@ class Network(object):
                 self.optm.zero_grad()                                   # Zero the gradient first
                 logit = self.model(inputs.float())                        # Get the output
                 loss = self.make_loss(logit, labels, metrics, 
-                                      bce_weight=self.flags.bce_weight)               # Get the loss tensor
+                                      bce_weight=self.flags.bce_weight,
+                                      boundary_weight=self.flags.boundary_weight)               # Get the loss tensor
                 loss.backward()                                     # Calculate the backward gradients
                 self.optm.step()                                    # Move one step the optimizer
                 epoch_samples += inputs.size(0)
@@ -371,6 +375,7 @@ class Network(object):
             inputs = sample['image']    # Get the input
             labels = sample['labels']   # Get the labels
             name = sample['name']       # Get the name
+            print(name)
             if cuda:
                 inputs = inputs.cuda()  # Put data onto GPU
                 labels = labels.cuda()  # Put data onto GPU
@@ -386,7 +391,7 @@ class Network(object):
                 pred_list.append(logit_numpy)
             if save_img:                        # If choose to save the evaluation images
                 self.save_eval_image(input_numpy, labels_numpy, logit_numpy,
-                                     batch_num=j, save_label=name)
+                                     batch_num=j, save_label=name, post_processing=post_processing)
             batch_IoU = self.compute_iou(logit_numpy, labels_numpy)  # Get the batch IoU
             iou_sum += batch_IoU  # Aggregate the batch IoU
             total_eval_num += inputs.size(0)
@@ -422,7 +427,9 @@ class Network(object):
         plt.savefig(os.path.join('data', self.ckpt_dir.replace('models','') + 'ROC.jpg'))
         return auroc
 
-    def save_eval_image(self, inputs, labels, logit, batch_num, save_dir='data/', save_label=None):
+    def save_eval_image(self, inputs, labels, logit, batch_num, 
+                        save_dir='data', save_label=None,
+                        post_processing=None):
         """
         Plot and save the evaluation image for the evaluation
         :param inputs: The input raw images
@@ -431,6 +438,7 @@ class Network(object):
         :param batch_num: The batch number to record
         :param save_dir: The direction to save
         :param save_label: If save_img, save the label as the name of the image or not
+        :param post_processing: the post-processing method to write as part of the image file name
         :return: None
         """
         for i in range(np.shape(inputs)[0]):
@@ -475,10 +483,17 @@ class Network(object):
             ##################
             # Save the image #
             ##################
+            if post_processing is None:
+                post_processing = ''
             if save_label is None:
-                f.savefig(os.path.join(save_dir, 'eval_graph_{}_{}.jpg'.format(batch_num, i)))
+                path = os.path.join(save_dir,'pp_' + post_processing +  self.ckpt_dir.split('models/')[-1]\
+                        + 'eval_graph_{}_{}.jpg'.format(batch_num, i))
+                f.savefig(path)
             else:
-                f.savefig(os.path.join(save_dir, save_label[i].replace('.jpg', '') + '_segmentation_result.jpg'))
+                path = os.path.join(save_dir, 'pp_' + post_processing + self.ckpt_dir.split('models/')[-1]\
+                        + save_label[i].replace('.jpg', '') + '_segmentation_result.jpg')
+                f.savefig(path)
+            plt.close()
             # Debuggin purpose to save the array
             #np.save('image.npy', inputs[0,0,:,:])
             #np.save('segment_out.npy', logit[0,0,:,:])

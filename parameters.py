@@ -42,8 +42,8 @@ TEST_LABEL_FILE = '/work/sr365/OCT_bscans_raw/test/label_file.csv'
 
 
 # Training related parameters
-TRAIN_STEP = 10
-MAX_TRAIN_SAMPLE = 40000000
+TRAIN_STEP = 2
+MAX_TRAIN_SAMPLE = 100000
 MAX_TEST_SAMPLE = 100
 LEARN_RATE = 1e-3
 LR_DECAY_RATE = 0.999
@@ -54,7 +54,9 @@ REG_SCALE = 5e-4
 EVAL_STEP = 1000
 MODEL_NAME = None
 BCE_WEIGHT = 0.5
+BOUNDARY_WEIGHT = 5
 EVAL_MODEL = 'resnet_18_pre_trained_True_batch_size_3_bce_weight_0.5_Epoch_5'
+RANDOM_SEED = 1111
 # Test ratio (Currently this flag value is useless because the patien id issue)
 TEST_RATIO = 0.2
 

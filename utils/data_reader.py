@@ -73,6 +73,9 @@ class ToTensor(object):
                 'name': names}
 
 def read_data(flags):
+    # Get the random seed manually set if random seed in flags is positive
+    if flags.random_seed > 0:
+        torch.manual_seed(flags.random_seed)
     trainSet = EyeDataset(flags, transform=ToTensor(),train=True)
     train_loader = DataLoader(trainSet, batch_size=flags.batch_size, shuffle=True,
                               num_workers=flags.num_workers)

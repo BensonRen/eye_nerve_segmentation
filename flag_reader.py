@@ -43,15 +43,17 @@ def read_flag():
     #                        help='decay learning rate at this number of steps')
 
     # Data Specific Params
+    parser.add_argument('--random-seed', type=int, default=RANDOM_SEED, help='The random SEED for data')
     parser.add_argument('--img-l', type=int, default=IMG_L, help='Length of the image')
     parser.add_argument('--img-w', type=int, default=IMG_W, help='Width of the image')
-    parser.add_argument('--num_workers', type=int, default=NUM_WORKERS, help='number of workers to  load the pictures')
+    parser.add_argument('--num-workers', type=int, default=NUM_WORKERS, help='number of workers to  load the pictures')
     parser.add_argument('--train-root-dir', type=str, default=TRAIN_ROOT_DIR, help='The Root directory to get the images')
     parser.add_argument('--train-label-file', type=str, default=TRAIN_LABEL_FILE, help='The label file to get the list of names')
     parser.add_argument('--test-root-dir', type=str, default=TEST_ROOT_DIR, help='The Root directory to get the images')
     parser.add_argument('--test-label-file', type=str, default=TEST_LABEL_FILE, help='The label file to get the list of names')
     parser.add_argument('--cut-square', type=bool, default=CUT_SQUARE, help='the flag to cut the image into 496 x 496')
     parser.add_argument('--bce-weight', default=BCE_WEIGHT, type=float, help='The weight of BCE loss in DICE loss [0,1], 1 means no dice loss')
+    parser.add_argument('--boundary-weight', default=BOUNDARY_WEIGHT, type=float, help='The weight of boundary loss close to the boundary of ground truth of target class')
 
 
 

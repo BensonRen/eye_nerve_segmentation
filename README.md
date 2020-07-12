@@ -72,7 +72,8 @@ python utils/pre_processing.py
 - [x] Run the 5 Epoch run on 2 GPUs for total length
 - [x] Write the weighted edge code
 - [x] Debug the morphological code and run the post-processing ablation studies
-- [ ] Analysis the post-processing effect on 10k inference
+- [x] Analysis the post-processing effect on 10k inference
+- [x] Get the fixed random seed into data loader
 - [ ] Debug the weighted edge code using different kernel sizes
 - [ ] Run model on "low quality images" to test out the comparison
 
